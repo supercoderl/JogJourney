@@ -24,6 +24,12 @@ import comment from './images/comment.png';
 import like from './images/like.png';
 import account_box from './images/account_box.png';
 import right from './images/right.png';
+import edit from './images/edit.png';
+import setting from './images/setting.png';
+import broken_image from './images/broken-image.png';
+import right_ios from './images/right-ios.png';
+import chart from './images/chart.png';
+import left from './images/left.png';
 
 export default {
     image: {
@@ -52,6 +58,12 @@ export default {
         comment,
         like,
         account_box,
-        right
+        right,
+        edit,
+        setting,
+        broken_image,
+        right_ios,
+        chart,
+        left
     },
 };

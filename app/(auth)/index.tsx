@@ -5,10 +5,10 @@ import { doc, getDoc } from '@firebase/firestore';
 import { router } from 'expo-router';
 import { onAuthStateChanged } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
-import { ImageBackground, StyleSheet, Text, View } from 'react-native';
+import { ImageBackground, StyleSheet, View } from 'react-native';
 
 export default () => {
-    const { user, setUser } = useAuth();
+    const { setUser, setUserInformation, user } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
 
     const checkIsInformationExists = async (id: string) => {
@@ -30,8 +30,17 @@ export default () => {
                 setTimeout(async () => {
                     if (authenticatedUser) {
                         setUser(authenticatedUser);
-                        const isExists = await checkIsInformationExists(authenticatedUser.uid);
-                        if (isExists) {
+                        const information = await checkIsInformationExists(authenticatedUser.uid);
+                        if (information) {
+                            const combinedUserData = {
+                                userId: authenticatedUser.uid,
+                                email: authenticatedUser.email,
+                                displayName: authenticatedUser.displayName,
+                                photoURL: authenticatedUser.photoURL,
+                                ...information, // Gộp thông tin từ Firestore
+                            };
+
+                            setUserInformation(combinedUserData); // Lưu object kết hợp vào state
                             router.push('/(home)');
                         }
                         else {
@@ -40,6 +49,7 @@ export default () => {
                     }
                     else {
                         setUser(null);
+                        setUserInformation(null);
                         router.push('/(auth)/login');
                     }
                     setIsLoading(false);
