@@ -28,6 +28,13 @@ const AppStack: React.FC = () => {
                     tabBarIcon: () => <MaterialCommunityIcons name="account-outline" size={24} color="white" />,
                 }}
             />
+            <Tabs.Screen
+                name="activity"
+                options={{
+                    title: 'Hoạt động',
+                    tabBarIcon: () => <MaterialCommunityIcons name="shoe-print" size={24} color="white" />,
+                }}
+            />
         </Tabs>
     );
 };

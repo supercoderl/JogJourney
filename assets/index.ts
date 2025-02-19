@@ -30,6 +30,8 @@ import broken_image from './images/broken-image.png';
 import right_ios from './images/right-ios.png';
 import chart from './images/chart.png';
 import left from './images/left.png';
+import sunny from './images/sunny.png';
+import image from './images/image.png';
 
 export default {
     image: {
@@ -64,6 +66,8 @@ export default {
         broken_image,
         right_ios,
         chart,
-        left
+        left,
+        sunny,
+        image
     },
 };
