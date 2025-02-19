@@ -50,9 +50,8 @@ export default function RegisterScreen() {
 
         setLoading(true);
 
-        await createUserWithEmailAndPassword(auth, email, password).then((res) => {
-            toast.success('Đăng ký thành công', 'Chuyển hướng đến trang đăng nhập.');
-            router.push('/(auth)/login');
+        await createUserWithEmailAndPassword(auth, email, password).then(() => {
+            toast.success('Đăng ký thành công', 'Chuyển hướng đến trang điền thông tin.');
         })
             .catch((error) => {
                 setErrorState(error.message);

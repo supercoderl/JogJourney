@@ -11,6 +11,19 @@ import celebration from './images/celebration.jpg';
 import gender from './images/transgender.jpg';
 import height from './images/height.jpg';
 import weight from './images/weight.jpg';
+import add from './images/add.png';
+import search from './images/search.png';
+import notification from './images/notification.png';
+import communities from './images/person.png';
+import group from './images/group.png';
+import captive_portal from './images/captive_portal.png';
+import person from './images/person.png';
+import option from './images/option.png';
+import star from './images/star.png';
+import comment from './images/comment.png';
+import like from './images/like.png';
+import account_box from './images/account_box.png';
+import right from './images/right.png';
 
 export default {
     image: {
@@ -26,6 +39,19 @@ export default {
         celebration,
         gender,
         height,
-        weight
+        weight,
+        add,
+        search,
+        notification,
+        communities,
+        group,
+        captive_portal,
+        person,
+        option,
+        star,
+        comment,
+        like,
+        account_box,
+        right
     },
 };

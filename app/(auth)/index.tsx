@@ -1,6 +1,7 @@
 import assets from '@/assets';
-import { auth } from '@/lib/firebase-config';
+import { auth, firestore } from '@/lib/firebase-config';
 import { useAuth } from '@/providers';
+import { doc, getDoc } from '@firebase/firestore';
 import { router } from 'expo-router';
 import { onAuthStateChanged } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
@@ -10,15 +11,32 @@ export default () => {
     const { user, setUser } = useAuth();
     const [isLoading, setIsLoading] = useState(true);
 
+    const checkIsInformationExists = async (id: string) => {
+        const docRef = doc(firestore, 'informations', id);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return docSnap.data(); // Trả về dữ liệu document
+        } else {
+            return null;
+        }
+    }
+
     useEffect(() => {
         // onAuthStateChanged returns an unsubscriber
         const unsubscribeAuthStateChanged = onAuthStateChanged(
             auth,
             (authenticatedUser) => {
-                setTimeout(() => {
+                setTimeout(async () => {
                     if (authenticatedUser) {
                         setUser(authenticatedUser);
-                        router.push('/(home)');
+                        const isExists = await checkIsInformationExists(authenticatedUser.uid);
+                        if (isExists) {
+                            router.push('/(home)');
+                        }
+                        else {
+                            router.push('/(auth)/profile');
+                        }
                     }
                     else {
                         setUser(null);
