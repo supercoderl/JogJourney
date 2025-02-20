@@ -32,6 +32,16 @@ import chart from './images/chart.png';
 import left from './images/left.png';
 import sunny from './images/sunny.png';
 import image from './images/image.png';
+import gift from './images/gift.png';
+import first from './images/first.png';
+import self_improvement from './images/self_improvement.png';
+import cloudy from './images/cloudy.png';
+import left_white from './images/left-white.png';
+import running from './images/running.png';
+import partly_cloudy from './images/partly-cloudy.png';
+import partly_cloudy_blur from './images/partly-cloudy-blur.png';
+import sun from './images/sun.png';
+import rain from './images/rain.png';
 
 export default {
     image: {
@@ -68,6 +78,16 @@ export default {
         chart,
         left,
         sunny,
-        image
+        image,
+        gift,
+        first,
+        self_improvement,
+        cloudy,
+        left_white,
+        running,
+        partly_cloudy,
+        partly_cloudy_blur,
+        sun,
+        rain
     },
 };

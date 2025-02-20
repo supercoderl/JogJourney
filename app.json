@@ -32,6 +32,47 @@
           "imageWidth": 200,
           "resizeMode": "contain"
         }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Inter-Black.otf",
+            "./assets/fonts/Inter-BlackItalic.otf",
+            "./assets/fonts/Inter-Bold.otf",
+            "./assets/fonts/Inter-BoldItalic.otf",
+            "./assets/fonts/Inter-ExtraBold.otf",
+            "./assets/fonts/Inter-ExtraBoldItalic.otf",
+            "./assets/fonts/Inter-ExtraLight.otf",
+            "./assets/fonts/Inter-ExtraLightItalic.otf",
+            "./assets/fonts/Inter-Italic.otf",
+            "./assets/fonts/Inter-Light.otf",
+            "./assets/fonts/Inter-LightItalic.otf",
+            "./assets/fonts/Inter-Medium.otf",
+            "./assets/fonts/Inter-MediumItalic.otf",
+            "./assets/fonts/Inter-Regular.otf",
+            "./assets/fonts/Inter-SemiBold.otf",
+            "./assets/fonts/Inter-SemiBoldItalic.otf",
+            "./assets/fonts/Inter-Thin.otf",
+            "./assets/fonts/Inter-ThinItalic.otf",
+            "./assets/fonts/Inter-V.ttf",
+            "./assets/fonts/Jomhuria-Regular.ttf",
+            "./assets/fonts/SpaceMono-Regular.ttf",
+            "./assets/fonts/Lohit-Bengali.ttf"
+          ]
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Cho phép $(PRODUCT_NAME) sử dụng vị trí của bạn."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Ứng dụng cần truy cập vào thư viện ảnh của bạn để chọn hình ảnh."
+        }
       ]
     ],
     "experiments": {

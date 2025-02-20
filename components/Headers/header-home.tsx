@@ -4,14 +4,16 @@ import { StyleSheet, TouchableOpacity, View, Image } from "react-native"
 interface HeaderProps {
     leftIcon?: ReactNode;
     rightIcon?: ReactNode;
+    children?: ReactNode;
 }
 
-const Header: React.FC<HeaderProps> = ({ leftIcon, rightIcon }) => {
+const Header: React.FC<HeaderProps> = ({ leftIcon, rightIcon, children }) => {
     return (
         <View style={style.container}>
             <TouchableOpacity>
                 {leftIcon && leftIcon}
             </TouchableOpacity>
+            {children}
             {rightIcon && rightIcon}
         </View>
     )

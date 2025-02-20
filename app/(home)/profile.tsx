@@ -1,24 +1,26 @@
 import assets from "@/assets";
 import Header from "@/components/Headers/header-home";
 import Horizontal from "@/components/Horizontal";
+import { useAuth } from "@/providers";
+import { calculateAge } from "@/utils";
 import screen from "@/utils/screen";
 import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View, Image, Text } from "react-native";
 
-const CenterInfomation = () => {
+const CenterInfomation = ({ userInformation }: { userInformation: any }) => {
     return (
         <View style={styles.centerInformationWrapper}>
             <View style={[styles.information, { borderRightWidth: 2, borderRightColor: 'white' }]}>
-                <Text style={styles.informationText}>175 cm</Text>
+                <Text style={styles.informationText}>{userInformation?.height ?? 0} cm</Text>
                 <Text style={styles.informationValue}>Height</Text>
             </View>
             <View style={styles.information}>
-                <Text style={styles.informationText}>24</Text>
+                <Text style={styles.informationText}>{calculateAge(userInformation?.birthday ?? '01/01/1999')}</Text>
                 <Text style={styles.informationValue}>Years old</Text>
             </View>
             <View style={[styles.information, { borderLeftWidth: 2, borderLeftColor: 'white' }]}>
-                <Text style={styles.informationText}>78 kg</Text>
+                <Text style={styles.informationText}>{userInformation?.weight ?? 0} kg</Text>
                 <Text style={styles.informationValue}>Weight</Text>
             </View>
         </View>
@@ -26,6 +28,8 @@ const CenterInfomation = () => {
 }
 
 export default function ProfileScreen() {
+    const { userInformation, setUserInformation } = useAuth();
+
     return (
         <View style={styles.container}>
             <Header
@@ -46,13 +50,13 @@ export default function ProfileScreen() {
                 <View style={styles.informationWrapper}>
                     <Text style={styles.title}>Thông tin cá nhân</Text>
                     <Image
-                        source={assets.image.avatar}
+                        source={userInformation?.avatar ? { uri: userInformation?.avatar } : assets.image.avatar}
                         style={styles.avatar}
                     />
-                    <Text style={styles.name}>Nguyễn Văn A</Text>
+                    <Text style={styles.name}>{userInformation?.fullname ?? 'Nguyễn Văn A'}</Text>
                     <Text style={{ fontSize: 13, color: '#342E2E' }}>Việt Nam</Text>
 
-                    <CenterInfomation />
+                    <CenterInfomation userInformation={userInformation} />
                 </View>
 
                 <Horizontal color="#D9D9D9" height={1} />

@@ -8,19 +8,22 @@ import Toast from 'react-native-toast-message';
 import { ThemeProvider, useTheme } from '@rneui/themed';
 import AppNavigator from '@/routes';
 import { AuthenticatedProvider } from '@/providers';
+import { EventProvider } from 'react-native-outside-press';
 
 export default function RootLayout() {
   const { theme } = useTheme();
 
   return (
     <AuthenticatedProvider>
-      <SafeAreaProvider>
-        <ThemeProvider theme={theme}>
-          <AppNavigator />
-          <Toast />
-          <StatusBar style="auto" />
-        </ThemeProvider>
-      </SafeAreaProvider>
+      <EventProvider>
+        <SafeAreaProvider>
+          <ThemeProvider theme={theme}>
+            <AppNavigator />
+            <Toast />
+            <StatusBar style="auto" />
+          </ThemeProvider>
+        </SafeAreaProvider>
+      </EventProvider>
     </AuthenticatedProvider>
   );
 }

@@ -1,15 +1,37 @@
 import assets from "@/assets"
 import { Post } from "@/types";
 import screen from "@/utils/screen"
-import React from "react"
-import { View, Image, StyleSheet, Text, TouchableOpacity } from "react-native"
+import React, { useState } from "react"
+import { View, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback } from "react-native"
 import MapView from 'react-native-maps';
+import BaseButton from "../Buttons/base-button";
+import OutsidePressHandler from 'react-native-outside-press';
 
 interface PostProps {
     post: Post
 }
 
+const Modal = () => {
+    return (
+        <View style={[{
+            backgroundColor: 'rgba(255, 255, 255, 0.5)',
+            justifyContent: 'center',
+            alignItems: 'center',
+        }, StyleSheet.absoluteFillObject]}>
+            <BaseButton
+                title="Tham gia"
+                onPress={() => { }}
+                buttonStyle={{ width: 'auto', paddingHorizontal: 40, paddingBlock: 12, borderRadius: 30, backgroundColor: 'rgb(140, 190, 239)' }}
+                titleStyle={{ fontWeight: 'bold', fontSize: 14 }}
+                viewStyle={{ alignSelf: 'flex-start' }}
+            />
+        </View>
+    )
+}
+
 const PostScreen: React.FC<PostProps> = ({ post }) => {
+    const [modalVisible, setModalVisible] = useState(false);
+
     return (
         <View style={styles.container}>
             <View style={{ paddingHorizontal: 10 }}>
@@ -27,7 +49,25 @@ const PostScreen: React.FC<PostProps> = ({ post }) => {
                 <Text style={styles.title}>{post.title}</Text>
             </View>
 
-            <MapView style={styles.map} />
+            <View style={styles.map}>
+                <MapView
+                    style={{ width: '100%', height: '100%' }}
+                    onPress={() => setModalVisible(true)}
+                />
+                {
+                    modalVisible &&
+                    <OutsidePressHandler
+                        onOutsidePress={() => setModalVisible(false)}
+                        style={[{
+                            backgroundColor: 'rgba(255, 255, 255, 0.5)',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                        }, StyleSheet.absoluteFillObject]}
+                    >
+                        <Modal />
+                    </OutsidePressHandler>
+                }
+            </View>
 
             <View style={styles.navWrapper}>
                 <TouchableOpacity>

@@ -59,7 +59,7 @@ export default () => {
 
         // unsubscribe auth listener on unmount
         return unsubscribeAuthStateChanged;
-    }, [user]);
+    }, [user, setUserInformation]);
 
     if (isLoading) {
         return (

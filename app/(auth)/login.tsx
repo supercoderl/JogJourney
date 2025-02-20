@@ -46,9 +46,7 @@ export default function LoginScreen() {
         }
 
         setLoading(true);
-        await signInWithEmailAndPassword(auth, email, password).then((res) => {
-            router.replace('/(home)');
-        }).catch((error) => {
+        await signInWithEmailAndPassword(auth, email, password).catch((error) => {
             setErrorState(error.message);
             toast.error("Lỗi đăng nhập", "Vui lòng kiểm tra lại thông tin đăng nhập.");
         }

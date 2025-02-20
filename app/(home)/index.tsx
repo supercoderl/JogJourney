@@ -4,9 +4,28 @@ import TopTabs from '@/components/Tabs/top-tab';
 import Connection from '@/screens/HomeScreen/connection';
 import Me from '@/screens/HomeScreen/me';
 import Propose from '@/screens/HomeScreen/propose';
+import { router } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import { StyleSheet, TouchableOpacity, View, Image } from 'react-native';
 import PagerView from "react-native-pager-view";
+
+const tabs = [
+    {
+        key: 0,
+        title: 'Kết nối',
+        icon: assets.image.captive_portal
+    },
+    {
+        key: 1,
+        title: 'Theo dõi',
+        icon: assets.image.group
+    },
+    {
+        key: 2,
+        title: 'Tôi',
+        icon: assets.image.person
+    }
+]
 
 export default () => {
     const pagerRef = useRef<PagerView>(null);
@@ -23,7 +42,7 @@ export default () => {
                 leftIcon={<Image source={assets.image.add} style={{ width: 24, height: 24 }} />}
                 rightIcon={
                     <View style={{ flexDirection: 'row', gap: 15 }}>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => router.push('/(map)/weather-check')}>
                             <Image source={assets.image.search} style={{ width: 24, height: 24 }} />
                         </TouchableOpacity>
                         <TouchableOpacity>
@@ -32,7 +51,7 @@ export default () => {
                     </View>
                 }
             />
-            <TopTabs onTabChange={handleTabChange} pageIndex={pageIndex} />
+            <TopTabs tabs={tabs} onTabChange={handleTabChange} pageIndex={pageIndex} />
             <PagerView
                 ref={pagerRef}
                 style={{ flex: 1 }}

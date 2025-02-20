@@ -1,13 +1,36 @@
 import assets from "@/assets";
 import Header from "@/components/Headers/header-home";
 import Horizontal from "@/components/Horizontal";
+import Loading from "@/components/Loadings/loading";
+import { firestore } from "@/lib/firebase-config";
+import { formatTimeAndDay } from "@/utils";
 import screen from "@/utils/screen";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { collection, getDocs, orderBy, query } from "@firebase/firestore";
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, TouchableOpacity, View, Text, Image, FlatList, ScrollView } from "react-native";
 
 export default function ActivityScreen() {
+    const [excercises, setExcercises] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
+    const [selectedEx, setSelectedEx] = useState<any>(null);
+
+    const getExcercises = async () => {
+        setLoading(true);
+
+        const q = query(collection(firestore, "excercises"), orderBy("index", "asc"));
+        await getDocs(q).then((res) => {
+            setExcercises(res.docs.map(doc => ({ ...doc.data() })));
+            setSelectedEx(res.docs.map(doc => ({ ...doc.data() }))[0]);
+        }).finally(() => setLoading(false));
+    }
+
+    useEffect(() => {
+        getExcercises();
+    }, []);
+
     return (
         <View style={styles.container}>
             <Header
@@ -30,14 +53,14 @@ export default function ActivityScreen() {
                     <View style={{ paddingHorizontal: 15 }}>
                         <View style={styles.contentContainer}>
                             <View>
-                                <Text style={{ fontWeight: 'bold', fontFamily: 'Inter', fontSize: 14 }}>09:30 Chủ Nhật</Text>
+                                <Text style={{ fontWeight: 'bold', fontFamily: 'Inter', fontSize: 14 }}>{formatTimeAndDay(new Date())}</Text>
                                 <Text style={styles.text}>Mây rải rác</Text>
                             </View>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                                 <Image source={assets.image.sunny} style={{ width: 79, height: 74 }} />
                                 <View>
-                                    <Text style={{ fontWeight: 'regular', fontFamily: 'Jomhuria', fontSize: 32, color: '#342E2E' }}>31°C</Text>
-                                    <Text style={{ fontWeight: 'regular', fontFamily: 'Jomhuria', fontSize: 16, color: '#8A8A8A' }}>87°F</Text>
+                                    <Text style={{ fontWeight: 'regular', fontFamily: 'Jomhuria', fontSize: 64, color: '#342E2E', marginTop: -20 }}>31°C</Text>
+                                    <Text style={{ fontWeight: 'regular', fontFamily: 'Jomhuria', fontSize: 32, color: '#8A8A8A', marginTop: -40 }}>87°F</Text>
                                 </View>
                             </View>
                         </View>
@@ -65,19 +88,28 @@ export default function ActivityScreen() {
                 <View style={styles.itemContainer}>
                     <Text style={styles.title}>Chọn bài tập</Text>
 
-                    <FlatList
-                        data={[1, 2, 3, 4, 5, 6, 7]}
-                        keyExtractor={(item) => item.toString()}
-                        renderItem={() => (
-                            <View style={{ padding: 10 }}>
-                                <MaterialCommunityIcons name="run" size={50} color="#8A8A8A" />
-                                <Text style={[styles.text, { color: '#8A8A8A' }]}>Chạy bộ</Text>
-                            </View>
-                        )}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{ paddingBlock: 5 }}
-                    />
+                    <View>
+                        <FlatList
+                            data={excercises}
+                            keyExtractor={(item, index) => index.toString()}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity
+                                    style={{ padding: 10 }}
+                                    onPress={() => setSelectedEx(item)}
+                                >
+                                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                        <MaterialIcons name={item.icon} size={50} color={selectedEx?.index === item.index ? "#19A1CB" : "#8A8A8A"} />
+                                        <Text style={[styles.text, { color: selectedEx?.index === item.index ? '#19A1CB' : '#8A8A8A' }]}>{item.name}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            )}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={{ paddingBlock: 5 }}
+                        />
+
+                        {loading && <Loading size={20} />}
+                    </View>
                 </View>
 
                 <Horizontal height={10} color="rgba(0, 0, 0, 0.03)" />
@@ -97,7 +129,8 @@ export default function ActivityScreen() {
                             alignItems: 'center',
                             zIndex: 1
                         }}>
-                            <MaterialCommunityIcons name="run" size={90} color="white" />
+                            <MaterialIcons name={selectedEx?.icon} size={90} color="white" />
+                            {loading && <Loading size={40} viewStyle={{ borderRadius: screen.width }} />}
                         </View>
 
                         <View style={{
@@ -125,14 +158,14 @@ export default function ActivityScreen() {
                         data={[1, 2, 3, 4, 5, 6, 7]}
                         keyExtractor={(item) => item.toString()}
                         renderItem={() => (
-                            <View style={{ borderRadius: 10 }}>
+                            <TouchableOpacity style={{ borderRadius: 10 }} onPress={() => router.push('/(map)/map-selection')}>
                                 <Image source={assets.image.image} style={{ width: 311, height: 184, borderTopLeftRadius: 10, borderTopRightRadius: 10 }} />
                                 <View style={{ backgroundColor: '#19A1CB', borderBottomLeftRadius: 10, borderBottomRightRadius: 10, padding: 15 }}>
                                     <Text style={{ fontWeight: 'bold', fontFamily: 'Inter', fontSize: 20, color: '#07476D' }}>GOAL 5km</Text>
                                     <Text style={{ fontWeight: 'bold', fontFamily: 'Inter', fontSize: 20, color: 'white' }}>Công viên gia định</Text>
                                     <Text style={{ fontWeight: 'regular', fontFamily: 'Inter', fontSize: 13, color: 'white' }}>P3, Gò Vấp, Tp. HCM</Text>
                                 </View>
-                            </View>
+                            </TouchableOpacity>
                         )}
                         horizontal
                         showsHorizontalScrollIndicator={false}

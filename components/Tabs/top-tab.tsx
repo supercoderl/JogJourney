@@ -1,31 +1,13 @@
 import React from 'react';
 import { TouchableOpacity, View, Image, Text, StyleSheet } from 'react-native';
-import assets from '@/assets';
 
 interface TopTabsProps {
     onTabChange: (tab: number) => void;
     pageIndex: number;
+    tabs: { key: number, title: string, icon: any }[];
 }
 
-const tabs = [
-    {
-        key: 0,
-        title: 'Kết nối',
-        icon: assets.image.captive_portal
-    },
-    {
-        key: 1,
-        title: 'Theo dõi',
-        icon: assets.image.group
-    },
-    {
-        key: 2,
-        title: 'Tôi',
-        icon: assets.image.person
-    }
-]
-
-const TopTabs: React.FC<TopTabsProps> = ({ onTabChange, pageIndex }) => {
+const TopTabs: React.FC<TopTabsProps> = ({ onTabChange, pageIndex, tabs }) => {
     return (
         <View style={styles.container}>
             {

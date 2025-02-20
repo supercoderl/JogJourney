@@ -8,13 +8,14 @@ interface BaseButtonProps {
     titleStyle?: TextStyle;
     onPress: () => void | Promise<void>;
     loading?: boolean
+    viewStyle?: ViewStyle;
 }
 
-const BaseButton: React.FC<BaseButtonProps> = ({ title, buttonStyle, titleStyle, leftIcon, onPress, loading }) => {
+const BaseButton: React.FC<BaseButtonProps> = ({ title, buttonStyle, titleStyle, leftIcon, onPress, loading, viewStyle }) => {
     return (
         <TouchableOpacity style={[styles.container, buttonStyle]} onPress={onPress}>
             {leftIcon && leftIcon}
-            <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 4 }}>
+            <View style={[{ alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 4 }, viewStyle]}>
                 {loading && <ActivityIndicator color="white" />}
                 <Text style={[styles.title, titleStyle]}>{title}</Text>
             </View>

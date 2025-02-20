@@ -3,6 +3,7 @@ import BaseButton from "@/components/Buttons/base-button"
 import Header from "@/components/Headers/header-home"
 import Horizontal from "@/components/Horizontal"
 import { auth } from "@/lib/firebase-config"
+import { useAuth } from "@/providers"
 import { router } from "expo-router"
 import { signOut } from "firebase/auth"
 import React, { useState } from "react"
@@ -10,10 +11,13 @@ import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native"
 
 const SettingScreen: React.FC = () => {
     const [loading, setLoading] = useState(false);
+    const { setUser, setUserInformation } = useAuth();
 
     const handleLogout = async () => {
         setLoading(true);
         await signOut(auth).then(() => {
+            setUser(null);
+            setUserInformation(null);
             setTimeout(() => router.push('/(auth)/login'));
         }).finally(() => setLoading(false));
     }

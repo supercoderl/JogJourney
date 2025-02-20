@@ -12,10 +12,15 @@ import { Formik, FormikHelpers } from "formik"
 import React, { useState } from "react"
 import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
+import * as ImagePicker from 'expo-image-picker';
+import { uploadImage } from "@/helpers/api"
+import Loading from "@/components/Loadings/loading"
 
 const EditInformationScreen: React.FC = () => {
-    const [loading, setLoading] = useState(false);
     const { userInformation, setUserInformation } = useAuth();
+    const [loading, setLoading] = useState(false);
+    const [imageLoading, setImageLoading] = useState(false);
+    const [image, setImage] = useState(userInformation?.avatar);
 
     const handleSubmit = async (
         values: { fullname: string; birthday: string; gender: string; height: string; weight: string; },
@@ -39,7 +44,7 @@ const EditInformationScreen: React.FC = () => {
 
         const userRef = doc(firestore, "informations", userInformation.userId);
         await updateDoc(userRef, {
-            fullname, gender, birthday, height, weight
+            fullname, gender, birthday, height, weight, avatar: image
         }).then(() => {
             const updatedData = {
                 ...userInformation, // Gộp thông tin từ Firestore
@@ -47,12 +52,39 @@ const EditInformationScreen: React.FC = () => {
                 birthday,
                 gender,
                 height,
-                weight
+                weight,
+                avatar: image
             };
             setUserInformation(updatedData);
             setValues(values);
             toast.success("Cập nhập thành công", "Đã hoàn thành!");
         }).finally(() => setLoading(false));
+    };
+
+    const pickImage = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images', 'videos'],
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+            base64: true
+        });
+
+        if (result && result.assets && result.assets.length > 0) {
+            let base64Img = `data:image/jpeg;base64,${result.assets[0]?.base64}`;
+
+            setImageLoading(true);
+            await uploadImage(base64Img).then((res) => {
+                if (res && res.data) {
+                    setImage(res.data.url);
+                }
+            }).catch((err) => console.log(err)).finally(() => setImageLoading(false));
+        }
+
+        if (!result.canceled) {
+
+        }
     };
 
     return (
@@ -76,13 +108,14 @@ const EditInformationScreen: React.FC = () => {
                     {/* Avatar */}
                     <View style={styles.avatarContainer}>
                         <Image
-                            source={assets.image.avatar}
+                            source={image ? { uri: image } : assets.image.avatar}
                             style={styles.avatar}
                         />
                         {/* Nút camera */}
-                        <TouchableOpacity style={styles.cameraButton}>
+                        <TouchableOpacity style={styles.cameraButton} onPress={pickImage}>
                             <Image source={assets.image.camera} style={{ width: 40, height: 40 }} />
                         </TouchableOpacity>
+                        {imageLoading && <Loading size={50} viewStyle={{ borderRadius: screen.width }} />}
                     </View>
 
                     <Formik<{ fullname: string; birthday: string; gender: string; height: string; weight: string; }>
@@ -188,7 +221,7 @@ const styles = StyleSheet.create({
 
     avatarContainer: {
         position: 'relative',
-        marginBlock: 25
+        marginBlock: 25,
     },
 
     avatar: {
@@ -201,6 +234,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         right: '5%',
+        zIndex: 2
     },
 
     inputWrapper: {
