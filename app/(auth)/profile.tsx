@@ -36,7 +36,7 @@ export default function ProfileScreen() {
         }
 
         setLoading(true);
-        await setDoc(doc(firestore, 'informations', user.uid), {
+        await setDoc(doc(firestore, 'informations', user?.uid), {
             fullname,
             birthday,
             gender,

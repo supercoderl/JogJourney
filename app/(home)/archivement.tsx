@@ -1,11 +1,14 @@
 import assets from "@/assets";
 import Header from "@/components/Headers/header-home";
 import TopTabs from "@/components/Tabs/top-tab";
+import { getMyAchievements, getTodayPoints, getUsers } from "@/helpers/api";
+import { useAuth } from "@/providers";
 import ArchivementMe from "@/screens/HomeScreen/archivement-me";
 import Competition from "@/screens/HomeScreen/competition";
 import ExchangePoint from "@/screens/HomeScreen/exchange-point";
-import React, { useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import React, { useEffect, useRef, useState } from "react";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import PagerView from "react-native-pager-view";
 
 const tabs = [
@@ -29,15 +32,47 @@ const tabs = [
 export default function ActivityScreen() {
     const pagerRef = useRef<PagerView>(null);
     const [pageIndex, setPageIndex] = useState(0);
+    const { userInformation } = useAuth();
+    const [users, setUsers] = useState<any[]>([]);
+    const [achivements, setAchievements] = useState<any[]>([]);
+    const [pointsGained, setPointsGained] = useState(0);
 
     const handleTabChange = (index: number) => {
         setPageIndex(index);
         pagerRef.current?.setPage(index); // Chuyển trang khi bấm tab
     };
 
+    const fetchData = async () => {
+        try {
+            const [achievementsData, usersData, point] = await Promise.all([
+                getMyAchievements(userInformation.userId),
+                getUsers(),
+                getTodayPoints(userInformation.userId)
+            ]);
+
+            setAchievements(achievementsData);
+            setUsers(usersData);
+            setPointsGained(point ?? 0);
+        } catch (error) {
+            console.error("Lỗi khi lấy dữ liệu:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (userInformation?.userId) {
+            fetchData();
+        }
+    }, []);
+
     return (
         <View style={styles.container}>
-            <Header />
+            <Header
+                rightIcon={
+                    <TouchableOpacity onPress={fetchData}>
+                        <MaterialCommunityIcons name='reload' size={24} color="white" />
+                    </TouchableOpacity>
+                }
+            />
 
             <TopTabs tabs={tabs} onTabChange={handleTabChange} pageIndex={pageIndex} />
             <PagerView
@@ -47,13 +82,19 @@ export default function ActivityScreen() {
                 scrollEnabled={false}
             >
                 <View key="1" style={[styles.page]}>
-                    <ArchivementMe onChangePage={() => handleTabChange(2)} />
+                    <ArchivementMe
+                        userInformation={userInformation}
+                        onChangePage={() => handleTabChange(2)}
+                        achivements={achivements}
+                        highestPoint={Math.max(...users.map(user => user?.totalPoints ?? 0)) ?? 0}
+                        pointsGained={pointsGained}
+                    />
                 </View>
                 <View key="2" style={styles.page}>
-                    <Competition />
+                    <Competition users={[...users].sort((a, b) => (b?.totalPoints ?? 0) - (a?.totalPoints ?? 0))} />
                 </View>
                 <View key="3" style={[styles.page, { paddingTop: 10 }]}>
-                    <ExchangePoint />
+                    <ExchangePoint userInformation={userInformation} />
                 </View>
             </PagerView>
         </View>

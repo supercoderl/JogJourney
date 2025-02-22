@@ -1,13 +1,49 @@
 import assets from "@/assets"
 import BaseButton from "@/components/Buttons/base-button"
 import Header from "@/components/Headers/header-home"
-import screen from "@/utils/screen"
+import Loading from "@/components/Loadings/loading"
+import { getChallengesByUser, getLevels, getMaps } from "@/helpers/api"
+import { useAuth } from "@/providers"
+import { formatTimeAndDay } from "@/utils"
+import { filterMap, getExcerciseName, getLevelName } from "@/utils/filter"
 import { router } from "expo-router"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { StyleSheet, TouchableOpacity, View, Image, Text, FlatList } from "react-native"
 import { Shadow } from 'react-native-shadow-2';
 
 const SaveScreen: React.FC = () => {
+    const { user } = useAuth();
+    const [loading, setLoading] = useState(false);
+    const [challenges, setChallenges] = useState<any[]>([]);
+    const [levels, setLevels] = useState<any[]>([]);
+    const [maps, setMaps] = useState<any[]>([]);
+
+    const getChallenges = async () => {
+        setLoading(true);
+
+        try {
+            const [challengesData, levelsData, mapsData] = await Promise.all([
+                getChallengesByUser(user.uid),
+                getLevels(),
+                getMaps()
+            ]);
+
+            setChallenges(challengesData);
+            setLevels(levelsData);
+            setMaps(mapsData);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        if (user) {
+            getChallenges();
+        }
+    }, []);
+
     return (
         <View style={styles.container}>
             <Header
@@ -20,23 +56,30 @@ const SaveScreen: React.FC = () => {
                 rightIcon={<View />}
             />
 
-            <FlatList
-                data={[1, 2]}
-                keyExtractor={(item) => item.toString()}
-                renderItem={() => (
-                    <Shadow style={styles.card}>
-                        <View>
-                            <Text style={styles.title}>Chạy bộ 1</Text>
-                            <Text style={styles.text}>Công viên Gia Định</Text>
-                            <Text style={styles.text}>10/11/2024 - 9:00 am</Text>
-                        </View>
-                        <View style={styles.imageContainer}>
-                            <Image source={assets.image.running} style={{ width: 74, height: 105.67 }} />
-                        </View>
-                    </Shadow>
-                )}
-                contentContainerStyle={{ paddingBlock: 20, paddingHorizontal: 10, gap: 30 }}
-            />
+            <View style={{ flex: 1 }}>
+                <FlatList
+                    data={challenges}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={({ item }) => (
+                        <Shadow style={styles.card}>
+                            <View>
+                                <Text style={styles.title}>{getExcerciseName(item?.excerciseId ?? 0).name} {getLevelName(levels, item?.levelId)}</Text>
+                                <Text style={styles.text}>{filterMap(maps, item?.mapId)?.name ?? 'Công viên'}</Text>
+                                <Text style={styles.text}>{formatTimeAndDay(item?.completedAt ?? new Date(), 'dateTime12h')}</Text>
+                            </View>
+
+                            <View style={[styles.imageContainer, { backgroundColor: getExcerciseName(item?.excerciseId ?? 0).color }]}>
+                                <Image
+                                    source={getExcerciseName(item?.excerciseId ?? 0).image}
+                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                />
+                            </View>
+                        </Shadow>
+                    )}
+                    contentContainerStyle={{ paddingBlock: 20, paddingHorizontal: 10, gap: 30 }}
+                />
+                {loading && <Loading size={40} />}
+            </View>
 
             <View style={{
                 position: 'absolute',
@@ -74,7 +117,6 @@ const styles = StyleSheet.create({
     imageContainer: {
         width: 116,
         height: 116,
-        backgroundColor: 'rgba(35,178,56,0.59)',
         borderRadius: 15,
         paddingBlock: 5,
         justifyContent: 'center',

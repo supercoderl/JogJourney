@@ -1,14 +1,14 @@
 import assets from "@/assets"
-import { Post } from "@/types";
 import screen from "@/utils/screen"
 import React, { useState } from "react"
 import { View, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback } from "react-native"
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import BaseButton from "../Buttons/base-button";
 import OutsidePressHandler from 'react-native-outside-press';
 
 interface PostProps {
-    post: Post
+    post: any;
+    userInformation: any;
 }
 
 const Modal = () => {
@@ -29,7 +29,7 @@ const Modal = () => {
     )
 }
 
-const PostScreen: React.FC<PostProps> = ({ post }) => {
+const PostScreen: React.FC<PostProps> = ({ post, userInformation }) => {
     const [modalVisible, setModalVisible] = useState(false);
 
     return (
@@ -38,10 +38,10 @@ const PostScreen: React.FC<PostProps> = ({ post }) => {
                 <View style={styles.userWrapper}>
                     <View style={styles.informationWrapper}>
                         <Image
-                            source={assets.image.avatar}
+                            source={userInformation?.avatar ? { uri: userInformation?.avatar } : assets.image.avatar}
                             style={styles.avatar}
                         />
-                        <Text style={styles.name}>Dương Kha</Text>
+                        <Text style={styles.name}>{userInformation?.name ?? userInformation?.fullname ?? 'Dương Kha'}</Text>
                     </View>
                     <Image source={assets.image.option} style={{ width: 24, height: 24 }} />
                 </View>
@@ -53,7 +53,21 @@ const PostScreen: React.FC<PostProps> = ({ post }) => {
                 <MapView
                     style={{ width: '100%', height: '100%' }}
                     onPress={() => setModalVisible(true)}
-                />
+                    region={{
+                        latitude: post?.location?.latitude ?? 0,
+                        longitude: post?.location?.longitude ?? 0,
+                        latitudeDelta: 0.01,
+                        longitudeDelta: 0.01,
+                    }}
+                    scrollEnabled={false}
+                    zoomEnabled={false}
+                >
+                    <Marker
+                        coordinate={{ latitude: post?.location?.latitude ?? 0, longitude: post?.location?.longitude ?? 0 }}
+                        title=""
+                        description=""
+                    />
+                </MapView>
                 {
                     modalVisible &&
                     <OutsidePressHandler

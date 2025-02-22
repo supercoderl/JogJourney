@@ -62,13 +62,13 @@ const Propose: React.FC = () => {
 
         // Lọc danh sách để loại bỏ user hiện tại
         return querySnapshot.docs
-            .filter(doc => doc.id !== user.uid)
+            .filter(doc => doc.id !== user?.uid)
             .map(doc => ({ id: doc.id, ...doc.data() }));
     };
 
     // 2. Lấy danh sách người bạn đã follow
     const getFollowingList = async () => {
-        const q = query(collection(firestore, "follows"), where("followerId", "==", user.uid));
+        const q = query(collection(firestore, "follows"), where("followerId", "==", user?.uid));
         const querySnapshot = await getDocs(q);
 
         return querySnapshot.docs.map(doc => doc.data().followingId);
@@ -115,7 +115,7 @@ const Propose: React.FC = () => {
                 <FlatList
                     data={unFollowedUsers}
                     keyExtractor={(item, index) => index.toString()}
-                    renderItem={({ item }) => <ProposeItem user={item} userId={user.uid} refreshFollowList={refreshFollowList} />}
+                    renderItem={({ item }) => <ProposeItem user={item} userId={user?.uid} refreshFollowList={refreshFollowList} />}
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={{ gap: 12, paddingVertical: 10, alignItems: 'flex-start' }}
                     horizontal

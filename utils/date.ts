@@ -1,40 +1,67 @@
 import { capitalizeWords } from ".";
 
-export const formatTimeAndDay = (date: Date, formatType?: 'time12h' | 'fullDate') => {
-    const formatter = new Intl.DateTimeFormat('vi-VN', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: formatType === 'time12h',
-        weekday: formatType === 'fullDate' ? 'long' : undefined,
-        day: formatType === 'fullDate' ? 'numeric' : undefined,
-        month: formatType === 'fullDate' ? 'long' : undefined,
-        year: formatType === 'fullDate' ? 'numeric' : undefined,
-    });
-
-    const parts = formatter.formatToParts(date);
+export const formatTimeAndDay = (
+    timestamp: { seconds: number; nanoseconds: number } | Date,
+    formatType?: 'time12h' | 'fullDate' | 'shortDateTime' | 'dateTime12h'
+) => {
+    if ('seconds' in timestamp && 'nanoseconds' in timestamp) {
+        timestamp = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1_000_000);
+    }
 
     if (formatType === 'time12h') {
-        // Lấy giờ, phút, và AM/PM (nếu có)
-        const time = parts
-            .map(p => (p.type === 'dayPeriod' ? p.value.toLowerCase() : p.value)) // Chữ thường cho AM/PM
-            .filter(p => p.trim() !== '') // Xóa khoảng trắng dư thừa
-            .join('');
-        return time;
+        return timestamp.toLocaleTimeString('vi-VN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
     }
 
     if (formatType === 'fullDate') {
-        // Lấy thứ, ngày, tháng, năm
-        let weekday = parts.find(p => p.type === 'weekday')?.value ?? '';
-        let day = parts.find(p => p.type === 'day')?.value ?? '';
-        let month = parts.find(p => p.type === 'month')?.value ?? '';
-
-        return `${capitalizeWords(weekday)}, ngày ${day}, ${month}`;
+        return timestamp.toLocaleDateString('vi-VN', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
     }
 
-    const time = parts.filter(p => p.type === 'hour' || p.type === 'minute').map(p => p.value).join(':');
-    let day = parts.find(p => p.type === 'weekday')?.value ?? '';
+    if (formatType === 'shortDateTime') {
+        const date = timestamp.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
 
-    return `${time} ${capitalizeWords(day)}`; // Viết hoa từng từ trong thứ
+        const time = timestamp.toLocaleTimeString('vi-VN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+        });
+
+        return `${date}, ${time}`; // Giữ đúng thứ tự ngày trước, giờ sau
+    }
+
+    if (formatType === 'dateTime12h') {
+        const date = timestamp.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+
+        const time = timestamp.toLocaleTimeString('vi-VN', {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+        });
+
+        return `${date} - ${time}`;
+    }
+
+    return timestamp.toLocaleTimeString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    });
 };
 
 export const calculateAge = (birthday: string) => {
@@ -54,4 +81,18 @@ export const calculateAge = (birthday: string) => {
     }
 
     return age;
+}
+
+export const getHourList = () => {
+    const now = new Date();
+    const hours = [];
+
+    for (let i = -1; i <= 2; i++) {
+        const date = new Date(now);
+        date.setHours(now.getHours() + i, 0, 0, 0); // Cộng/trừ giờ
+        const hourString = date.getHours().toString().padStart(2, '0') + ":00";
+        hours.push(hourString);
+    }
+
+    return hours;
 }

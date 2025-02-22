@@ -1,12 +1,19 @@
 import assets from "@/assets";
+import Star from "@/components/ui/star";
+import { getRandomColor } from "@/utils";
+import screen from "@/utils/screen";
 import React from "react"
 import { FlatList, Image, StyleSheet, Text, View } from "react-native"
 
-const Competition = () => {
+interface CompetitionProps {
+    users: any[];
+}
+
+const Competition: React.FC<CompetitionProps> = ({ users }) => {
     return (
         <View style={styles.container}>
             <View style={styles.card}>
-                <Image source={assets.image.avatar} style={styles.avatar} />
+                <Image source={users && users.length > 0 ? users[0]?.avatar ? { uri: users[0]?.avatar } : assets.image.avatar : assets.image.avatar} style={styles.avatar} />
                 <View style={{ width: '50%' }}>
                     <Text style={styles.title}>Xếp hạng tuần này</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -15,7 +22,7 @@ const Competition = () => {
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 5 }}>
                         <View>
                             <Text style={styles.extraText}>Điểm cao nhất</Text>
-                            <Text style={styles.extraScore}>1050</Text>
+                            <Text style={styles.extraScore}>{users && users.length > 0 ? users[0]?.totalPoints ?? 0 : 0}</Text>
                         </View>
                         <View>
                             <Text style={styles.extraText}>Điểm hôm nay</Text>
@@ -26,24 +33,24 @@ const Competition = () => {
             </View>
 
             <FlatList
-                data={[1, 2, 3, 4, 5, 6]}
-                keyExtractor={(item) => item.toString()}
-                renderItem={() => (
+                data={users}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => (
                     <View style={{ backgroundColor: 'white', paddingBlock: 2, paddingHorizontal: 10 }}>
-                        <View style={{ 
-                            flexDirection: 'row', 
-                            alignItems: 'center', 
-                            justifyContent: 'space-between', 
-                            paddingBlock: 15, 
+                        <View style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            paddingBlock: 15,
                             paddingHorizontal: 10,
                             gap: 25
                         }}>
-                            <Image source={assets.image.first} style={styles.prize} />
+                            <Star size={37} text={String(index + 1)} color={getRandomColor()} />
                             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                                <Image source={assets.image.avatar} style={{ width: 40, height: 40 }} />
+                                <Image source={item?.avatar ? { uri: item?.avatar } : assets.image.avatar} style={{ width: 40, height: 40, borderRadius: screen.width }} />
                                 <View style={{}}>
-                                    <Text style={styles.name}>Nguyễn Văn A</Text>
-                                    <Text style={[styles.extraText, { color: '#19A1CB', fontWeight: 'bold' }]}>1050 điểm</Text>
+                                    <Text style={styles.name}>{item?.fullname ?? 'Nguyễn Văn A'}</Text>
+                                    <Text style={[styles.extraText, { color: '#19A1CB', fontWeight: 'bold' }]}>{item?.totalPoints ?? 0} điểm</Text>
                                 </View>
                             </View>
                             <View style={{ alignItems: 'center' }}>
@@ -71,6 +78,7 @@ const styles = StyleSheet.create({
     avatar: {
         width: 89,
         height: 89,
+        borderRadius: screen.width
     },
 
     card: {

@@ -1,23 +1,61 @@
 import assets from "@/assets";
 import BaseButton from "@/components/Buttons/base-button";
 import Horizontal from "@/components/Horizontal";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import React from "react"
+import { fetchExerciseById } from "@/helpers/api";
+import { formatTimeAndDay, getAchievementStatusName } from "@/utils";
+import screen from "@/utils/screen";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import React, { useEffect, useState } from "react"
 import { FlatList, Image, StyleSheet, Text, View } from "react-native"
+import { Shadow } from "react-native-shadow-2";
 
 interface ArchivementMeProps {
     onChangePage: () => void;
+    userInformation: any;
+    achivements: any[];
+    highestPoint: number;
+    pointsGained: number;
 }
 
-const ArchivementMe: React.FC<ArchivementMeProps> = ({ onChangePage }) => {
+const AchievementItem = ({ item }: { item: any }) => {
+    const [exercise, setExercise] = useState<any>(null);
+
+    useEffect(() => {
+        if (item?.excerciseId) {
+            fetchExerciseById(item?.excerciseId).then(setExercise);
+        }
+    }, [item?.excerciseId]);
+
+    return (
+        <View style={{ backgroundColor: 'white', paddingVertical: 2, paddingHorizontal: 10 }}>
+            <Text style={styles.extraText}>{formatTimeAndDay(item?.createdAt, 'shortDateTime')}</Text>
+            <Horizontal height={1} color="#D9D9D9" />
+            <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 15, paddingHorizontal: 10 }}>
+                <MaterialIcons name={exercise?.icon || 'directions-run'} size={44} color='#1C1B1F' />
+                <View style={{ flex: 1 }}>
+                    <Text style={styles.listText}>{item?.title}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Text style={styles.listStatus}>{getAchievementStatusName(item?.status)}</Text>
+                        <Text style={[styles.extraText, { color: '#19A1CB' }]}>{item?.status === 3 ? `+${exercise?.score ?? 0}` : 0}</Text>
+                    </View>
+                </View>
+            </View>
+        </View>
+    );
+};
+
+const ArchivementMe: React.FC<ArchivementMeProps> = ({ onChangePage, userInformation, achivements, highestPoint, pointsGained }) => {
+
     return (
         <View style={styles.container}>
             <View style={styles.card}>
-                <Image source={assets.image.avatar} style={styles.avatar} />
+                <Shadow>
+                    <Image source={userInformation?.avatar ? { uri: userInformation.avatar } : assets.image.avatar} style={styles.avatar} />
+                </Shadow>
                 <View style={{ width: '50%' }}>
                     <Text style={styles.title}>Điểm:</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Text style={styles.mainScore}>950</Text>
+                        <Text style={styles.mainScore}>{userInformation?.totalPoints ?? 0}</Text>
                         <BaseButton
                             title="Đổi điểm"
                             onPress={onChangePage}
@@ -29,35 +67,20 @@ const ArchivementMe: React.FC<ArchivementMeProps> = ({ onChangePage }) => {
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 5 }}>
                         <View>
                             <Text style={styles.extraText}>Điểm cao NH</Text>
-                            <Text style={styles.extraScore}>1050</Text>
+                            <Text style={styles.extraScore}>{highestPoint}</Text>
                         </View>
                         <View>
                             <Text style={styles.extraText}>Điểm hôm nay</Text>
-                            <Text style={styles.extraScore}>+50</Text>
+                            <Text style={styles.extraScore}>{pointsGained > 0 ? `+${pointsGained}` : 0}</Text>
                         </View>
                     </View>
                 </View>
             </View>
 
             <FlatList
-                data={[1, 2, 3, 4, 5, 6]}
-                keyExtractor={(item) => item.toString()}
-                renderItem={() => (
-                    <View style={{ backgroundColor: 'white', paddingBlock: 2, paddingHorizontal: 10 }}>
-                        <Text style={styles.extraText}>21/10/2024, 16:00</Text>
-                        <Horizontal height={1} color="#D9D9D9" />
-                        <View style={{ flexDirection: 'row', alignItems: 'center', paddingBlock: 15, paddingHorizontal: 10 }}>
-                            <MaterialCommunityIcons name="run" size={44} color='#1C1B1F' />
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.listText}>Chạy bộ buổi chiều</Text>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <Text style={styles.listStatus}>Đã hoàn thành</Text>
-                                    <Text style={[styles.extraText, { color: '#19A1CB' }]}>+50</Text>
-                                </View>
-                            </View>
-                        </View>
-                    </View>
-                )}
+                data={achivements}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => <AchievementItem item={item} />}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ gap: 10, paddingBlock: 10, paddingHorizontal: 30 }}
             />
@@ -76,6 +99,7 @@ const styles = StyleSheet.create({
     avatar: {
         width: 89,
         height: 89,
+        borderRadius: screen.width
     },
 
     card: {

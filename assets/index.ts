@@ -42,6 +42,15 @@ import partly_cloudy from './images/partly-cloudy.png';
 import partly_cloudy_blur from './images/partly-cloudy-blur.png';
 import sun from './images/sun.png';
 import rain from './images/rain.png';
+import cardiogram from './images/cardiogram.png';
+import recordBg from './images/record-bg.png';
+import item from './images/item.png';
+import recorder from './images/recorder.png';
+import pause from './images/pause.png';
+import stop from './images/stop.png';
+import medal from './images/medal.png';
+import run from './images/run.png';
+import bike from './images/bike.png';
 
 export default {
     image: {
@@ -88,6 +97,15 @@ export default {
         partly_cloudy,
         partly_cloudy_blur,
         sun,
-        rain
+        rain,
+        cardiogram,
+        recordBg,
+        item,
+        recorder,
+        pause,
+        stop,
+        medal,
+        run,
+        bike
     },
 };

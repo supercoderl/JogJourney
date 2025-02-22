@@ -7,6 +7,7 @@ export default function MapStack() {
             <Stack.Screen name="index"  />
             <Stack.Screen name="map-selection" />
             <Stack.Screen name="save" />
+            <Stack.Screen name="detail" />
         </Stack>
     );
 }

@@ -1,12 +1,33 @@
 import assets from "@/assets"
 import Header from "@/components/Headers/header-home"
+import { toast } from "@/utils"
 import screen from "@/utils/screen"
-import { router } from "expo-router"
-import React from "react"
+import { router, useLocalSearchParams } from "expo-router"
+import React, { useEffect } from "react"
 import { StyleSheet, TouchableOpacity, View, Image, Text, ScrollView } from "react-native"
-import MapView from "react-native-maps"
+import MapView, { Polyline } from "react-native-maps"
 
 const MapSelectionScreen: React.FC = () => {
+    const map = useLocalSearchParams();
+
+    const giaDinhParkBoundary = [
+        { latitude: 10.8141439, longitude: 106.6748091 },
+        { latitude: 10.813477, longitude: 106.677092 },
+        { latitude: 10.812223, longitude: 106.676702 },
+        { latitude: 10.811100, longitude: 106.675901 },
+        { latitude: 10.809804, longitude: 106.674102 },
+        { latitude: 10.810674, longitude: 106.672821 },
+        { latitude: 10.812300, longitude: 106.672214 },
+        { latitude: 10.8141439, longitude: 106.6748091 }
+    ];
+
+    useEffect(() => {
+        if (!map) {
+            toast.error('Lỗi tham số', 'Vui lòng kiểm tra lại tham số truyền vào');
+            router.back();
+        }
+    }, []);
+
     return (
         <View style={styles.container}>
             <Header
@@ -21,26 +42,39 @@ const MapSelectionScreen: React.FC = () => {
 
             <ScrollView showsVerticalScrollIndicator={false}>
                 <View style={styles.contentContainer}>
-                    <Text style={styles.title}>CÔNG VIÊN GIA ĐỊNH</Text>
-                    <Text style={styles.address}>P3, Gò Vấp, TP.HCM</Text>
+                    <Text style={styles.title}>{map?.name ?? 'CÔNG VIÊN GIA ĐỊNH'}</Text>
+                    <Text style={styles.address}>{map?.address ?? 'P3, Gò Vấp, TP.HCM'}</Text>
 
                     <View style={{ width: '100%', height: screen.width / 1.5625 }}>
                         <MapView
                             style={{ width: '100%', height: '100%' }}
-                        />
+                            region={{
+                                latitude: 10.811877,
+                                longitude: 106.674593,
+                                latitudeDelta: 0.008,
+                                longitudeDelta: 0.009,
+                            }}
+                            onPress={() => router.push({ pathname: '/(map)/map-record', params: map })}
+                        >
+                            <Polyline
+                                coordinates={giaDinhParkBoundary}
+                                strokeWidth={4} // Độ dày đường
+                                strokeColor="blue" // Màu xanh
+                            />
+                        </MapView>
                     </View>
 
                     <View style={styles.informationWrapper}>
                         <View style={styles.item}>
-                            <Text style={styles.value}>Open</Text>
+                            <Text style={styles.value}>{map?.status ? 'Open' : 'Close'}</Text>
                             <Text style={styles.text}>Status</Text>
                         </View>
                         <View style={styles.item}>
-                            <Text style={styles.value}>4 <Text style={{ fontSize: 18 }}>⭐</Text></Text>
+                            <Text style={styles.value}>{map?.rate ?? 4} <Text style={{ fontSize: 18 }}>⭐</Text></Text>
                             <Text style={styles.text}>Rate</Text>
                         </View>
                         <View style={styles.item}>
-                            <Text style={styles.value}>Good</Text>
+                            <Text style={styles.value}>{map?.weather ?? 'Good'}</Text>
                             <Text style={styles.text}>Weather</Text>
                         </View>
                         <View style={styles.item}>
@@ -53,7 +87,7 @@ const MapSelectionScreen: React.FC = () => {
                 <View style={styles.description}>
                     <Text style={{ fontSize: 14 }}>
                         <Text style={{ fontWeight: 'bold' }}>Mô tả: </Text>
-                        Phù hợp với người  mới bắt đầu, độ dài phù hợp, bằng phẳng, ít chướng ngại vật, nhiều cây xanh.
+                        {map?.description ?? 'Phù hợp với người  mới bắt đầu, độ dài phù hợp, bằng phẳng, ít chướng ngại vật, nhiều cây xanh.'}
                     </Text>
                 </View>
             </ScrollView>
@@ -76,7 +110,7 @@ const styles = StyleSheet.create({
     },
 
     title: {
-        fontWeight: 'regular',
+        fontWeight: 'bold',
         fontFamily: 'Inter',
         fontSize: 24,
         color: '#342E2E'
