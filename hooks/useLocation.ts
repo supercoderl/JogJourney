@@ -16,6 +16,15 @@ const useCurrentLocation = () => {
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null); // Bộ đếm thời gian
   const [maxSpeed, setMaxSpeed] = useState(0);
 
+  const requestPermissions = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Bạn cần cấp quyền truy cập vị trí để sử dụng tính năng này!');
+      return false;
+    }
+    return true;
+  };
+
   const getDistance = (coord1: Location.LocationObjectCoords, coord2: Location.LocationObjectCoords) => {
     const R = 6371e3; // Bán kính Trái đất (mét)
     const lat1 = (coord1.latitude * Math.PI) / 180;
@@ -32,6 +41,9 @@ const useCurrentLocation = () => {
   };
 
   const startTracking = async () => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) return;
+
     // Bắt đầu đếm thời gian mỗi giây
     const interval = setInterval(() => {
       setElapsedTime((prev) => prev + 1);
@@ -71,6 +83,8 @@ const useCurrentLocation = () => {
                   speed: null
                 }
               );
+
+              console.log("Distance: ", dist);
 
               if (dist >= 1) {
                 setDistance((d) => d + dist);
@@ -121,6 +135,9 @@ const useCurrentLocation = () => {
   };
 
   const resumeTracking = async () => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) return;
+
     setIsPaused(false);
 
     if (!timer) {
@@ -142,6 +159,9 @@ const useCurrentLocation = () => {
           if (prev.length > 0) {
             const lastLocation = prev[prev.length - 1];
             const dist = getDistance(lastLocation, newLocation.coords);
+
+            console.log("Distance: ", dist);
+
             if (dist >= 1) {
               setDistance((d) => d + dist);
             }

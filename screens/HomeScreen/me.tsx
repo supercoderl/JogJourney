@@ -27,7 +27,7 @@ const Me: React.FC = () => {
         if (userInformation) {
             getPosts();
         }
-    }, []);
+    }, [userInformation]);
 
     return (
         <View>

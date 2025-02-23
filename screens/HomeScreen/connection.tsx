@@ -14,7 +14,7 @@ const Connection: React.FC = () => {
         setLoading(true);
 
         try {
-            const postsData = await getPostsWithoutUser(userInformation.userId);
+            const postsData = await getPostsWithoutUser(userInformation?.userId);
 
             // Lấy danh sách userId từ danh sách posts
             const userIds = [...new Set(postsData.map((post: any) => post.userId))];
@@ -47,7 +47,7 @@ const Connection: React.FC = () => {
         if (userInformation) {
             getPosts();
         }
-    }, []);
+    }, [userInformation]);
 
     return (
         <View>

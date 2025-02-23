@@ -66,7 +66,7 @@ export default function ActivityScreen() {
         if (userInformation?.userId) {
             fetchData();
         }
-    }, []);
+    }, [userInformation]);
 
     return (
         <View style={styles.container}>

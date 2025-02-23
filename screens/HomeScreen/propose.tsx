@@ -103,7 +103,7 @@ const Propose: React.FC = () => {
                 setUnFollowedUsers(unfollowedUsers);
             });
         }
-    }, []);
+    }, [user]);
 
     return (
         <View style={styles.container}>

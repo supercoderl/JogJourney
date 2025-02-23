@@ -42,7 +42,7 @@ const SaveScreen: React.FC = () => {
         if (user) {
             getChallenges();
         }
-    }, []);
+    }, [user]);
 
     return (
         <View style={styles.container}>
