@@ -2,24 +2,48 @@ import assets from "@/assets";
 import BaseButton from "@/components/Buttons/base-button";
 import Loading from "@/components/Loadings/loading";
 import { firestore } from "@/lib/firebase-config";
+import { toast } from "@/utils";
 import screen from "@/utils/screen";
-import { collection, getDocs } from "@firebase/firestore";
+import { collection, doc, getDocs, setDoc } from "@firebase/firestore";
 import React, { useEffect, useState } from "react"
-import { FlatList, Image, RefreshControl, StyleSheet, Text, View } from "react-native"
+import { ActivityIndicator, FlatList, Image, Modal, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 
 interface ExchangePointProps {
     userInformation: any;
+    setUserInformation: (userInformation: any) => void;
 }
 
-const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation }) => {
+const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation, setUserInformation }) => {
     const [items, setItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const [exchangeLoading, setExchangeLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
     const getItems = async () => {
         setLoading(true);
         await getDocs(collection(firestore, "items")).then((res) => {
             setItems(res.docs.map(doc => doc.data()));
         }).finally(() => setLoading(false));
+    }
+
+    const handleExchange = async (item: any) => {
+        setExchangeLoading(true);
+
+        if (userInformation?.totalPoints < item?.pointsCost) {
+            toast.error("Lỗi", "Bạn không đủ điểm để đổi quà này.");
+            return;
+        }
+
+        const point = userInformation?.totalPoints - item?.pointsCost;
+        await setDoc(doc(firestore, "informations", userInformation?.userId), {
+            ...userInformation,
+            totalPoints: point
+        }).then(() => {
+            setUserInformation({
+                ...userInformation,
+                totalPoints: point
+            });
+        }).finally(() => setExchangeLoading(false));
     }
 
     useEffect(() => {
@@ -33,7 +57,7 @@ const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation }) => {
                 <View style={{ width: '50%' }}>
                     <Text style={styles.title}>Điểm đang có:</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Text style={styles.mainScore}>{userInformation?.totalPoints ?? 0}</Text>
+                        {exchangeLoading ? <ActivityIndicator size={40} /> : <Text style={styles.mainScore}>{userInformation?.totalPoints ?? 0}</Text>}
                     </View>
                 </View>
             </View>
@@ -60,7 +84,7 @@ const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation }) => {
                                         <Text style={styles.name}>{item?.title ?? 'Giảm giá khóa học Yoga cho nữ 30%'}</Text>
                                         <BaseButton
                                             title={item?.pointsCost ?? 0}
-                                            onPress={() => { }}
+                                            onPress={() => setShowModal(true)}
                                             buttonStyle={{ alignSelf: 'flex-start', width: 'auto', paddingBlock: 4, paddingHorizontal: 20 }}
                                             titleStyle={{ fontWeight: 'bold', fontSize: 14 }}
                                             viewStyle={{ alignSelf: 'flex-start' }}
@@ -76,6 +100,28 @@ const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation }) => {
 
                 {loading && <Loading size={40} />}
             </View>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={showModal}
+                onRequestClose={() => setShowModal(false)}
+            >
+                <View style={styles.center}>
+                    <View style={{ backgroundColor: '#19A1CB', paddingBlock: 30, width: '100%', alignItems: 'center' }}>
+                        <Text style={styles.modalTitle}>Xác nhận đổi ?</Text>
+
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
+                            <TouchableOpacity style={styles.modalButton} onPress={handleExchange}>
+                                <Text style={styles.modalButtonText}>Yes</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.modalButton} onPress={() => setShowModal(false)}>
+                                <Text style={styles.modalButtonText}>No</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
     )
 }
@@ -144,4 +190,35 @@ const styles = StyleSheet.create({
         color: '#342E2E',
         width: '75%'
     },
+
+    center: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.3)'
+    },
+
+    modalTitle: {
+        fontWeight: 'regular',
+        fontFamily: 'Inter',
+        fontSize: 36,
+        color: 'white',
+        textAlign: 'center',
+        width: '80%',
+        lineHeight: 38
+    },
+
+    modalButton: {
+        paddingBlock: 6,
+        paddingHorizontal: 25,
+        backgroundColor: 'white',
+        marginTop: 40
+    },
+
+    modalButtonText: {
+        fontWeight: 'regular',
+        fontFamily: 'Inter',
+        fontSize: 20,
+        color: '#19A1CB'
+    }
 })

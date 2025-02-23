@@ -7,23 +7,23 @@ import { collection, getDocs, orderBy, query } from "@firebase/firestore"
 import React, { useEffect, useState } from "react"
 import { View, Text, TouchableOpacity, FlatList, StyleSheet } from "react-native"
 
-const ExcerciseSelection = () => {
-    const [excercises, setExcercises] = useState<any[]>([]);
+const ExerciseSelection = () => {
+    const [exercises, setExercises] = useState<any[]>([]);
     const [fetchLoading, setLoading] = useState(false);
     const [selectedEx, setSelectedEx] = useState<any>(null);
 
-    const getExcercises = async () => {
+    const getExercises = async () => {
         setLoading(true);
 
-        const q = query(collection(firestore, "excercises"), orderBy("index", "asc"));
+        const q = query(collection(firestore, "exercises"), orderBy("index", "asc"));
         await getDocs(q).then((res) => {
-            setExcercises(res.docs.map(doc => ({ ...doc.data() })));
+            setExercises(res.docs.map(doc => ({ ...doc.data() })));
             setSelectedEx(res.docs.map(doc => ({ ...doc.data() }))[0]);
         }).finally(() => setLoading(false));
     }
 
     useEffect(() => {
-        getExcercises();
+        getExercises();
     }, []);
 
     return (
@@ -33,7 +33,7 @@ const ExcerciseSelection = () => {
 
                 <View>
                     <FlatList
-                        data={excercises}
+                        data={exercises}
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={({ item }) => (
                             <TouchableOpacity
@@ -95,7 +95,7 @@ const ExcerciseSelection = () => {
     )
 }
 
-export default ExcerciseSelection;
+export default ExerciseSelection;
 
 const styles = StyleSheet.create({
     itemContainer: {

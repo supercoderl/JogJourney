@@ -4,24 +4,25 @@ import Horizontal from "@/components/Horizontal";
 import BaseInput from "@/components/Inputs/base-input";
 import { auth } from "@/lib/firebase-config";
 import screen from "@/utils/screen";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { GoogleAuthProvider, signInWithCredential, signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
-import { Image, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TouchableWithoutFeedback, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import { Formik } from 'formik';
-import { loginValidationSchema, toast } from "@/utils";
+import { toast } from "@/utils";
 import { useTogglePasswordVisibility } from "@/hooks";
-import { Link, router } from "expo-router";
+import { Link } from "expo-router";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
-// import { GoogleSignin } from '@react-native-google-signin/google-signin';
-
-// GoogleSignin.configure({
-//     webClientId: '779217320193-mh8remlf4ah3bhnu2k9fser55frp48gk.apps.googleusercontent.com',
-// });
+GoogleSignin.configure({
+    webClientId: '779217320193-mh8remlf4ah3bhnu2k9fser55frp48gk.apps.googleusercontent.com',
+    offlineAccess: true, // Lấy refresh token để duy trì đăng nhập
+    forceCodeForRefreshToken: true, // Bắt buộc lấy authorization code thay vì chỉ access token
+    scopes: ['email', 'profile'], // Quyền truy cập email và profile của user
+});
 
 export default function LoginScreen() {
     const [errorState, setErrorState] = useState("");
-    const { passwordVisibility } = useTogglePasswordVisibility();
     const [loading, setLoading] = useState(false);
 
     const handleLogin = async (values: { email: string, password: string }) => {
@@ -55,31 +56,19 @@ export default function LoginScreen() {
 
     const handleLoginByGoogle = async () => {
         // // Check if your device supports Google Play
-        // await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
         // // Get the users ID token
-        // // const { idToken, } = await GoogleSignin.signIn();
-        // const sInfo = await GoogleSignin.signIn();
+        const sInfo = await GoogleSignin.signIn();
 
         // console.log('====================================');
         // console.log("sInfo ", sInfo);
         // console.log('====================================');
 
         // // Create a Google credential with the token
-        // const googleCredential = GoogleAuthProvider.credential(sInfo.data?.idToken);
+        const googleCredential = GoogleAuthProvider.credential(sInfo.data?.idToken);
 
         // // Sign-in the user with the credential
-        // const info = await signInWithCredential(auth, googleCredential);
-
-
-        // console.log('====================================');
-        // console.log("info ", info);
-        // console.log('====================================');
-
-        // const firebaseIdToken = await info.user.getIdToken();
-
-        // console.log('====================================');
-        // console.log("firebaseIdToken ", firebaseIdToken);
-        // console.log('====================================');
+        await signInWithCredential(auth, googleCredential);
     }
 
     return (
@@ -151,6 +140,7 @@ export default function LoginScreen() {
                     <BaseButton
                         leftIcon={<Image source={assets.image.facebook} style={{ width: 24, height: 24 }} />}
                         title="Tài khoản Facebook"
+                        viewStyle={{ flex: 1 }}
                         onPress={() => { }}
                     />
                     <BaseButton
@@ -159,6 +149,7 @@ export default function LoginScreen() {
                         buttonStyle={{ backgroundColor: '#F5F5F5' }}
                         titleStyle={{ color: '#595050' }}
                         onPress={handleLoginByGoogle}
+                        viewStyle={{ flex: 1 }}
                     />
                 </View>
 

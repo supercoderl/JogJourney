@@ -3,6 +3,7 @@ import Header from "@/components/Headers/header-home";
 import Horizontal from "@/components/Horizontal";
 import Loading from "@/components/Loadings/loading";
 import useCurrentLocation from "@/hooks/useLocation";
+import { useAuth } from "@/providers";
 import RecordMap from "@/screens/HomeScreen/map/record";
 import { toast } from "@/utils";
 import screen from "@/utils/screen";
@@ -24,8 +25,10 @@ export default function RecordScreen() {
         resumeTracking,
         isPaused,
         elapsedTime,
-        maxSpeed
+        maxSpeed,
+        isTracking
     } = useCurrentLocation();
+    const { userInformation } = useAuth();
 
     const [showModal, setShowModal] = useState(false);
 
@@ -100,6 +103,7 @@ export default function RecordScreen() {
                     {/* Nội dung cuộn */}
                     <RecordMap
                         handleShowModal={setShowModal}
+                        isTracking={isTracking}
                         border={
                             <View style={styles.border}>
                                 <TouchableOpacity onPress={() => {
@@ -152,7 +156,13 @@ export default function RecordScreen() {
                     <Horizontal height={20} color="rgb(240, 238, 238)" styles={{ zIndex: 6 }} />
 
                     <View style={styles.submitView}>
-                        <TouchableOpacity style={styles.submitButton} onPress={() => router.push('/(map)/challenge')}>
+                        <TouchableOpacity style={styles.submitButton} onPress={() => {
+                            if (!userInformation?.type || userInformation?.type === 'free') {
+                                toast.error("Không được", "Bạn phải đăng ký gói Pro để vào thử thách");
+                                return;
+                            }
+                            router.push('/(map)/challenge')
+                        }}>
                             <Text style={styles.submitText}>Thử thách</Text>
                         </TouchableOpacity>
                     </View>
@@ -180,7 +190,10 @@ export default function RecordScreen() {
                                             distance,
                                             caloriesBurned,
                                             speed,
-                                            maxSpeed
+                                            maxSpeed,
+                                            exerciseId: 1,
+                                            mapId: null,
+                                            level: null
                                         })
                                     }
                                 })

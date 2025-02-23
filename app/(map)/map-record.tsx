@@ -2,8 +2,8 @@ import assets from "@/assets";
 import Header from "@/components/Headers/header-home";
 import Horizontal from "@/components/Horizontal";
 import useCurrentLocation from "@/hooks/useLocation";
-import useStepCounter from "@/hooks/useStepCounter";
 import useWeather from "@/hooks/useWeather";
+import { useAuth } from "@/providers";
 import MapDetail from "@/screens/HomeScreen/map/map-detail";
 import RecordMap from "@/screens/HomeScreen/map/record";
 import { toast } from "@/utils";
@@ -16,6 +16,12 @@ import MapView, { Polyline } from "react-native-maps";
 export default function MapRecordScreen() {
     const scrollY = useRef(new Animated.Value(0)).current;
     const [showModal, setShowModal] = useState(false);
+    const [level, setLevel] = useState<any>(null);
+    const [exercise, setExercise] = useState<any>(null);
+    const [map, setMap] = useState<any>(null);
+
+    const hasStartedTracking = useRef(false);
+
     const { weather, loading } = useWeather();
     const {
         location,
@@ -28,10 +34,12 @@ export default function MapRecordScreen() {
         resumeTracking,
         isPaused,
         elapsedTime,
-        maxSpeed
+        maxSpeed,
+        isTracking
     } = useCurrentLocation();
+    const { userInformation } = useAuth();
 
-    const map = useLocalSearchParams();
+    const params = useLocalSearchParams();
 
     const giaDinhParkBoundary = [
         { latitude: 10.8141439, longitude: 106.6748091 },
@@ -45,17 +53,72 @@ export default function MapRecordScreen() {
     ];
 
     useEffect(() => {
-        if (!map) {
-            toast.error('Lỗi tham số', 'Vui lòng kiểm tra lại tham số truyền vào');
-            router.replace('/(home)/activity');
+        if (params) {
+            if (!params.map) {
+                toast.error('Lỗi tham số', 'Vui lòng kiểm tra lại tham số truyền vào');
+                router.replace('/(home)/activity');
+                return;
+            }
+
+            if (typeof params.map === 'string') {
+                try {
+                    const parsedMap = JSON.parse(params.map);
+                    setMap((prev: any) => (JSON.stringify(prev) !== JSON.stringify(parsedMap) ? parsedMap : prev));
+                } catch (error) {
+                    console.error('Lỗi khi parse map:', error);
+                }
+            }
         }
-    }, []);
+    }, [params]);
+
+    useEffect(() => {
+        if (params?.level && params?.exercise && typeof params.level === 'string' && typeof params.exercise === 'string') {
+            try {
+                const parsedLevel = JSON.parse(params.level);
+                const parsedExercise = JSON.parse(params.exercise);
+
+                setLevel((prev: any) => (JSON.stringify(prev) !== JSON.stringify(parsedLevel) ? parsedLevel : prev));
+                setExercise((prev: any) => (JSON.stringify(prev) !== JSON.stringify(parsedExercise) ? parsedExercise : prev));
+
+                // Chỉ gọi startTracking nếu chưa gọi trước đó
+                if (!hasStartedTracking.current) {
+                    startTracking();
+                    hasStartedTracking.current = true; // Đánh dấu đã gọi
+                }
+            } catch (error) {
+                console.error('Lỗi khi parse level hoặc exercise:', error);
+            }
+        }
+    }, [params?.level, params?.exercise]);
+
+    useEffect(() => {
+        if (level && map && exercise && Number(distance.toFixed(0)) >= map?.distance) {
+            toast.success("Chúc mừng", "Bạn đã hoàn thành thử thách");
+            stopTracking();
+            router.replace({
+                pathname: '/(map)/detail',
+                params: {
+                    type: "record",
+                    result: JSON.stringify({
+                        elapsedTime,
+                        distance,
+                        caloriesBurned,
+                        speed,
+                        maxSpeed,
+                        level: level,
+                        exerciseId: exercise?.index
+                    }),
+                    map: JSON.stringify(map)
+                }
+            });
+        }
+    }, [distance, level, map, exercise]);
 
     return (
         <View style={styles.container}>
             <Header
                 leftIcon={
-                    <TouchableOpacity onPress={() => router.back()}>
+                    <TouchableOpacity onPress={() => router.replace('/(home)')}>
                         <Image source={assets.image.left_white} style={{ width: 24, height: 24 }} />
                     </TouchableOpacity>
                 }
@@ -115,6 +178,7 @@ export default function MapRecordScreen() {
                     <RecordMap
                         map={map}
                         handleShowModal={setShowModal}
+                        isTracking={isTracking}
                         border={
                             <View style={styles.border}>
                                 <View style={styles.innerBorder}>
@@ -143,7 +207,8 @@ export default function MapRecordScreen() {
                             caloriesBurnt: caloriesBurned.toFixed(1),
                             averageSpeed: (speed * 3.6).toFixed(2),
                             formattedTime: elapsedTime,
-                            weather
+                            weather,
+                            level
                         }}
                         loading={loading}
                     />
@@ -151,7 +216,13 @@ export default function MapRecordScreen() {
                     <Horizontal height={20} color="rgb(240, 238, 238)" styles={{ zIndex: 6 }} />
 
                     <View style={styles.submitView}>
-                        <TouchableOpacity style={styles.submitButton} onPress={() => router.push('/(map)/challenge')}>
+                        <TouchableOpacity style={styles.submitButton} onPress={() => {
+                            if (!userInformation?.type || userInformation?.type === 'free') {
+                                toast.error("Không được", "Bạn phải đăng ký gói Pro để vào thử thách");
+                                return;
+                            }
+                            router.push({ pathname: '/(map)/challenge', params: map })
+                        }}>
                             <Text style={styles.submitText}>Thử thách</Text>
                         </TouchableOpacity>
                     </View>
@@ -166,10 +237,15 @@ export default function MapRecordScreen() {
             >
                 <View style={styles.center}>
                     <View style={{ backgroundColor: '#19A1CB', paddingBlock: 30, width: '100%', alignItems: 'center' }}>
-                        <Text style={styles.modalTitle}>Đồng ý dừng ?</Text>
+                        <Text style={styles.modalTitle}>Đồng ý dừng ? {map?.distance > (distance.toFixed(0)) && '(Lưu ý bạn chưa hoàn thành thử thách)'}</Text>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
                             <TouchableOpacity style={styles.modalButton} onPress={() => {
+                                if (map?.distance > (distance.toFixed(0))) {
+                                    setShowModal(false);
+                                    toast.error("Không được", "Bạn chưa hoàn thành thử thách");
+                                    return;
+                                }
                                 toast.info("Kết thúc", "Bạn đã dừng bộ đếm.");
                                 stopTracking();
                                 router.replace({
@@ -181,7 +257,9 @@ export default function MapRecordScreen() {
                                             distance,
                                             caloriesBurned,
                                             speed,
-                                            maxSpeed
+                                            maxSpeed,
+                                            level: level,
+                                            exerciseId: exercise?.index
                                         }),
                                         map: JSON.stringify(map)
                                     }

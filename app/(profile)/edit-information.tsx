@@ -15,6 +15,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import * as ImagePicker from 'expo-image-picker';
 import { uploadImage } from "@/helpers/api"
 import Loading from "@/components/Loadings/loading"
+import BaseSelect from "@/components/Selects/base-select"
 
 const EditInformationScreen: React.FC = () => {
     const { userInformation, setUserInformation } = useAuth();
@@ -155,14 +156,12 @@ const EditInformationScreen: React.FC = () => {
                                         onChangeText={handleChange("birthday")}
                                         onBlur={handleBlur("birthday")}
                                     />
-                                    <BaseInput
+                                    <BaseSelect
                                         leftIcon={<Image source={assets.image.gender} style={{ width: 24, height: 24 }} />}
-                                        placeholder="Giới tính"
-                                        placeholderTextColor="#8A8A8A"
-                                        autoCapitalize="none"
-                                        value={values.gender}
-                                        onChangeText={handleChange("gender")}
-                                        onBlur={handleBlur("gender")}
+                                        data={[{ value: 'Nam', label: 'Nam' }, { value: 'Nữ', label: 'Nữ' }, { value: 'Khác', label: 'Khác' }]}
+                                        selected={values.gender}
+                                        placeHolderText="Giới tính"
+                                        onSelect={handleChange("gender")}
                                     />
                                     <BaseInput
                                         leftIcon={<Image source={assets.image.height} style={{ width: 24, height: 24 }} />}

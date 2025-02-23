@@ -25,9 +25,9 @@ export const filterMap = (maps: any[], mapId: string) => {
     return maps.find(m => m.id === mapId);
 };
 
-export const getExcerciseName = (excerciseId: number) => {
+export const getExerciseName = (exerciseId: number) => {
     let result = { name: '', image: assets.image.run, color: 'rgba(35,178,56,0.59)' };
-    switch (excerciseId) {
+    switch (exerciseId) {
         case 1:
             result = { name: 'Chạy bộ', image: assets.image.run, color: 'rgba(35,178,56,0.59)' };
             break;

@@ -1,5 +1,5 @@
 import { firestore } from "@/lib/firebase-config";
-import { collection, doc, getDoc, getDocs, query, where } from "@firebase/firestore";
+import { collection, doc, getDoc, getDocs, orderBy, query, where } from "@firebase/firestore";
 import axios from "axios";
 
 export const uploadImage = async (imageUri: string) => {
@@ -63,9 +63,9 @@ export const getMyAchievements = async (userId: string) => {
     }
 };
 
-export const fetchExerciseById = async (excerciseId: number) => {
+export const fetchExerciseById = async (exerciseId: number) => {
     try {
-        const q = query(collection(firestore, "excercises"), where("index", "==", excerciseId)); // Tạo query
+        const q = query(collection(firestore, "exercises"), where("index", "==", exerciseId)); // Tạo query
         const querySnapshot = await getDocs(q); // Lấy dữ liệu
 
         if (!querySnapshot.empty) {
@@ -73,7 +73,7 @@ export const fetchExerciseById = async (excerciseId: number) => {
         }
         return null;
     } catch (error) {
-        console.error("Lỗi khi fetch excercise:", error);
+        console.error("Lỗi khi fetch exercise:", error);
         return [];
     }
 };
@@ -124,6 +124,18 @@ export const getLevels = async () => {
     }
     catch (error) {
         console.log("Lỗi khi lấy danh sách cấp độ: ", error);
+        return [];
+    }
+};
+
+export const getExercises = async () => {
+    try {
+        const q = query(collection(firestore, "exercises"), orderBy("index", "asc"));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+    }
+    catch (error) {
+        console.log("Lỗi khi lấy danh sách bản lưu: ", error);
         return [];
     }
 };

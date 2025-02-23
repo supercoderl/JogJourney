@@ -7,11 +7,12 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native"
 interface RecordMapProps {
     map?: any;
     handleShowModal: (value: boolean) => void;
+    isTracking: boolean;
     border: ReactNode;
     handlePause: () => void;
 }
 
-const RecordMap: React.FC<RecordMapProps> = ({ map, handleShowModal, border, handlePause }) => {
+const RecordMap: React.FC<RecordMapProps> = ({ map, handleShowModal, border, handlePause, isTracking }) => {
 
     return (
         <View style={[styles.contentContainer]}>
@@ -24,7 +25,14 @@ const RecordMap: React.FC<RecordMapProps> = ({ map, handleShowModal, border, han
                     <Image source={assets.image.pause} style={styles.iconButton} />
                     <Text style={styles.textButton}>Pause</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.button} onPress={() => handleShowModal(true)}>
+                <TouchableOpacity style={styles.button} onPress={() => {
+                    if(!isTracking)
+                    {
+                        toast.error("Không được", "Bộ đếm chưa hoạt động, không thể dừng.");
+                        return;
+                    }
+                    handleShowModal(true)
+                }}>
                     <Image source={assets.image.stop} style={styles.iconButton} />
                     <Text style={styles.textButton}>Stop</Text>
                 </TouchableOpacity>

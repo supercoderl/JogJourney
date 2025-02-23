@@ -28,7 +28,7 @@ const CenterInfomation = ({ userInformation }: { userInformation: any }) => {
 }
 
 export default function ProfileScreen() {
-    const { userInformation, setUserInformation } = useAuth();
+    const { userInformation } = useAuth();
 
     return (
         <View style={styles.container}>

@@ -7,9 +7,10 @@ import { FlatList, Image, StyleSheet, Text, View } from "react-native"
 
 interface CompetitionProps {
     users: any[];
+    pointsGained: number;
 }
 
-const Competition: React.FC<CompetitionProps> = ({ users }) => {
+const Competition: React.FC<CompetitionProps> = ({ users, pointsGained }) => {
     return (
         <View style={styles.container}>
             <View style={styles.card}>
@@ -26,7 +27,7 @@ const Competition: React.FC<CompetitionProps> = ({ users }) => {
                         </View>
                         <View>
                             <Text style={styles.extraText}>Điểm hôm nay</Text>
-                            <Text style={styles.extraScore}>+50</Text>
+                            <Text style={styles.extraScore}>{pointsGained > 0 ? `+${pointsGained}` : 0}</Text>
                         </View>
                     </View>
                 </View>

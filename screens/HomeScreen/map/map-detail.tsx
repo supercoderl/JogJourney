@@ -19,7 +19,7 @@ const MapDetail: React.FC<MapDetailProps> = ({ map, recordInfo, loading }) => {
                     <Text style={styles.text}>Năng lượng (calo)</Text>
                 </View>
                 <View style={styles.itemB}>
-                    <Text style={styles.value}>{recordInfo?.formattedTime ?? 0} min</Text>
+                    <Text style={styles.value}>{((recordInfo?.formattedTime ?? 0) / 60).toFixed(0)} min</Text>
                     <Text style={styles.text}>Thời gian chạy</Text>
                 </View>
                 <View style={styles.itemA}>
@@ -31,7 +31,7 @@ const MapDetail: React.FC<MapDetailProps> = ({ map, recordInfo, loading }) => {
                     <Text style={styles.text}>Nhịp tim</Text>
                 </View>
                 <View style={styles.itemA}>
-                    <Text style={styles.value}>1</Text>
+                    <Text style={styles.value}>{recordInfo?.level ? 1 : 0}</Text>
                     <Text style={styles.text}>Thử thách</Text>
                 </View>
                 <View style={styles.itemB}>

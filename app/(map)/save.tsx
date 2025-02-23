@@ -5,7 +5,7 @@ import Loading from "@/components/Loadings/loading"
 import { getChallengesByUser, getLevels, getMaps } from "@/helpers/api"
 import { useAuth } from "@/providers"
 import { formatTimeAndDay } from "@/utils"
-import { filterMap, getExcerciseName, getLevelName } from "@/utils/filter"
+import { filterMap, getExerciseName, getLevelName } from "@/utils/filter"
 import { router } from "expo-router"
 import React, { useEffect, useState } from "react"
 import { StyleSheet, TouchableOpacity, View, Image, Text, FlatList } from "react-native"
@@ -62,18 +62,28 @@ const SaveScreen: React.FC = () => {
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
                         <Shadow style={styles.card}>
-                            <View>
-                                <Text style={styles.title}>{getExcerciseName(item?.excerciseId ?? 0).name} {getLevelName(levels, item?.levelId)}</Text>
-                                <Text style={styles.text}>{filterMap(maps, item?.mapId)?.name ?? 'Công viên'}</Text>
-                                <Text style={styles.text}>{formatTimeAndDay(item?.completedAt ?? new Date(), 'dateTime12h')}</Text>
-                            </View>
+                            <TouchableOpacity onPress={() => router.push({
+                                pathname: '/(map)/detail', params: {
+                                    type: 'save',
+                                    result: JSON.stringify(item),
+                                    map: JSON.stringify(filterMap(maps, item?.mapId)),
+                                }
+                            })}
+                                style={styles.row}
+                            >
+                                <View>
+                                    <Text style={styles.title}>{getExerciseName(item?.exerciseId ?? 0).name} {getLevelName(levels, item?.levelId)}</Text>
+                                    <Text style={styles.text}>{filterMap(maps, item?.mapId)?.name ?? 'Công viên'}</Text>
+                                    <Text style={styles.text}>{formatTimeAndDay(item?.completedAt ?? new Date(), 'dateTime12h')}</Text>
+                                </View>
 
-                            <View style={[styles.imageContainer, { backgroundColor: getExcerciseName(item?.excerciseId ?? 0).color }]}>
-                                <Image
-                                    source={getExcerciseName(item?.excerciseId ?? 0).image}
-                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                />
-                            </View>
+                                <View style={[styles.imageContainer, { backgroundColor: getExerciseName(item?.exerciseId ?? 0).color }]}>
+                                    <Image
+                                        source={getExerciseName(item?.exerciseId ?? 0).image}
+                                        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                    />
+                                </View>
+                            </TouchableOpacity>
                         </Shadow>
                     )}
                     contentContainerStyle={{ paddingBlock: 20, paddingHorizontal: 10, gap: 30 }}
@@ -81,21 +91,15 @@ const SaveScreen: React.FC = () => {
                 {loading && <Loading size={40} />}
             </View>
 
-            <View style={{
-                position: 'absolute',
-                bottom: 0,
-                width: '100%',
-            }}>
-                <BaseButton
-                    title="Trang chủ"
-                    onPress={() => router.push('/(home)')}
-                    buttonStyle={{
-                        borderRadius: 0,
-                        height: 66
-                    }}
-                    titleStyle={{ fontWeight: 'bold', fontSize: 24 }}
-                />
-            </View>
+            <BaseButton
+                title="Trang chủ"
+                onPress={() => router.push('/(home)')}
+                buttonStyle={{
+                    borderRadius: 0,
+                    height: 66
+                }}
+                titleStyle={{ fontWeight: 'bold', fontSize: 24 }}
+            />
         </View>
     )
 }
@@ -123,10 +127,13 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
 
-    card: {
+    row: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+    },
+
+    card: {
         width: '100%',
         borderRadius: 15,
         paddingBlock: 10,

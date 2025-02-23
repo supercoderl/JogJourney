@@ -6,7 +6,7 @@ import { router } from "expo-router"
 import React, { useEffect, useState } from "react"
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from "react-native"
 
-const ExcerciseHint = () => {
+const ExerciseHint = () => {
     const [maps, setMaps] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
 
@@ -51,7 +51,7 @@ const ExcerciseHint = () => {
     )
 }
 
-export default ExcerciseHint;
+export default ExerciseHint;
 
 const styles = StyleSheet.create({
     itemContainer: {

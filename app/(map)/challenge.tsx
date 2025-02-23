@@ -1,27 +1,52 @@
 import assets from "@/assets";
 import Header from "@/components/Headers/header-home";
-import { router } from "expo-router";
-import React, { useState } from "react";
-import { TouchableOpacity, View, Image, Text, StyleSheet, Modal } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useState } from "react";
+import { TouchableOpacity, View, Image, Text, StyleSheet, Modal, FlatList, RefreshControl } from "react-native";
 import { Shadow } from "react-native-shadow-2";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import BaseButton from "@/components/Buttons/base-button";
 import screen from "@/utils/screen";
+import { getExercises, getLevels } from "@/helpers/api";
+import Loading from "@/components/Loadings/loading";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
-const Tab = () => {
+const Tab = ({
+    exercises,
+    selectedEx,
+    onSelect
+}: {
+    exercises: any[],
+    selectedEx: any,
+    onSelect: (ex: any) => void
+}) => {
     return (
         <View style={{ backgroundColor: 'rgba(0, 0, 0, 0.03)', paddingTop: 12 }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', gap: 5, zIndex: 2 }}>
-                <Shadow distance={1} offset={[3, -3]} startColor="rgba(0, 0, 0, 0.05)">
-                    <TouchableOpacity style={{ paddingBlock: 6, paddingHorizontal: 10, backgroundColor: 'white', borderRadius: 8 }}>
-                        <Ionicons name="walk" size={38} />
-                    </TouchableOpacity>
-                </Shadow>
-                <Shadow distance={1} offset={[3, -3]} startColor="rgba(0, 0, 0, 0.05)">
-                    <TouchableOpacity style={{ paddingBlock: 6, paddingHorizontal: 10, borderRadius: 8, backgroundColor: '#E0E0E0' }}>
-                        <Ionicons name="bicycle-sharp" size={38} color="#9DC08B" />
-                    </TouchableOpacity>
-                </Shadow>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                <FlatList
+                    data={exercises}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={({ item }) => (
+                        <Shadow distance={1} offset={[3, -3]} startColor="rgba(0, 0, 0, 0.05)">
+                            <TouchableOpacity style={{
+                                paddingBlock: 6,
+                                paddingHorizontal: 10,
+                                backgroundColor: selectedEx && selectedEx.index === item.index ? 'white' : '#E0E0E0',
+                                borderRadius: 8
+                            }}
+                                onPress={() => onSelect(item)}
+                            >
+                                <MaterialIcons
+                                    name={item.icon ?? 'directions-run'}
+                                    size={38}
+                                    color={selectedEx && selectedEx.index === item.index ? 'black' : '#3D8D7A'}
+                                />
+                            </TouchableOpacity>
+                        </Shadow>
+                    )}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{ gap: 5 }}
+                />
             </View>
         </View>
     )
@@ -30,6 +55,36 @@ const Tab = () => {
 
 const ChallengeScreen: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [levels, setLevels] = useState<any[]>([]);
+    const [exercises, setExercises] = useState<any[]>([]);
+    const [selectedEx, setSelectedEx] = useState<any>(null);
+    const [selectedLevel, setSelectedLevel] = useState<any>(null);
+    const map = useLocalSearchParams();
+
+    const getLevelsAsync = async () => {
+        setLoading(true);
+
+        try {
+            const [exercisesData, levelsData] = await Promise.all([
+                getExercises(),
+                getLevels(),
+            ]);
+
+            setLevels(levelsData);
+            setExercises(exercisesData);
+
+            if (exercisesData && exercisesData.length > 0) setSelectedEx(exercisesData[0]);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        getLevelsAsync();
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -43,53 +98,58 @@ const ChallengeScreen: React.FC = () => {
                 rightIcon={<View />}
             />
 
-            <View style={{ backgroundColor: 'white', width: '100%', height: 80 }} />
+            <View style={{ flex: 1 }}>
+                <View style={{ backgroundColor: 'white', width: '100%', height: 80 }} />
 
-            <Tab />
-
-            <View style={{ paddingBlock: 60, backgroundColor: 'white', gap: 30 }}>
-                <BaseButton
-                    title="Người tham gia 1 - Beginer"
-                    leftIcon={
-                        <Ionicons name="walk" size={45} color="white" />
-                    }
-                    buttonStyle={styles.button}
-                    onPress={() => setShowModal(true)}
+                <Tab
+                    exercises={exercises}
+                    selectedEx={selectedEx}
+                    onSelect={setSelectedEx}
                 />
 
-                <BaseButton
-                    title="Người tham gia 2 - Beginer"
-                    leftIcon={
-                        <Ionicons name="walk" size={45} color="white" />
-                    }
-                    buttonStyle={styles.button}
-                    onPress={() => { }}
-                />
+                <View style={{ paddingBlock: 60, backgroundColor: 'white' }}>
+                    <FlatList
+                        data={levels}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={({ item, index }) => (
+                            <BaseButton
+                                title={`Người tham gia ${index + 1} - ${item.name}`}
+                                leftIcon={
+                                    <MaterialIcons name={selectedEx ? selectedEx.icon : 'directions-run'} size={45} color="white" />
+                                }
+                                buttonStyle={styles.button}
+                                onPress={() => {
+                                    setShowModal(true);
+                                    setSelectedLevel(item);
+                                }}
+                            />
+                        )}
+                        contentContainerStyle={{ gap: 30, width: '100%' }}
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={loading}
+                                onRefresh={getLevelsAsync}
+                            />
+                        }
+                    />
+                </View>
 
-                <BaseButton
-                    title="Người tham gia 3 - Advanced"
-                    leftIcon={
-                        <Ionicons name="walk" size={45} color="white" />
-                    }
-                    buttonStyle={styles.button}
-                    onPress={() => { }}
-                />
-            </View>
-
-            <View style={{
-                position: 'absolute',
-                bottom: 0,
-                width: '100%',
-            }}>
-                <BaseButton
-                    title="Trang chủ"
-                    onPress={() => router.push('/(home)')}
-                    buttonStyle={{
-                        borderRadius: 0,
-                        height: 66
-                    }}
-                    titleStyle={{ fontWeight: 'bold', fontSize: 24 }}
-                />
+                <View style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    width: '100%',
+                }}>
+                    <BaseButton
+                        title="Trang chủ"
+                        onPress={() => router.push('/(home)')}
+                        buttonStyle={{
+                            borderRadius: 0,
+                            height: 66
+                        }}
+                        titleStyle={{ fontWeight: 'bold', fontSize: 24 }}
+                    />
+                </View>
+                {loading && <Loading size={40} backgroundColor="white" />}
             </View>
 
             <Modal
@@ -103,7 +163,13 @@ const ChallengeScreen: React.FC = () => {
                         <Text style={styles.modalTitle}>Thử thách với người này ?</Text>
 
                         <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
-                            <TouchableOpacity style={styles.modalButton}>
+                            <TouchableOpacity style={styles.modalButton} onPress={() =>
+                                router.push({ pathname: '/(map)/map-record', params: {
+                                    map: JSON.stringify(map),
+                                    level: JSON.stringify(selectedLevel),
+                                    exercise: JSON.stringify(selectedEx)
+                                } })
+                            }>
                                 <Text style={styles.modalButtonText}>Yes</Text>
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.modalButton} onPress={() => setShowModal(false)}>
@@ -139,6 +205,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         gap: screen.width * 0.12,
         shadowColor: "#000",
+        width: '100%',
         shadowOffset: {
             width: 0,
             height: 7,

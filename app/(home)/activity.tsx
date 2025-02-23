@@ -1,7 +1,7 @@
 import Header from "@/components/Headers/header-home";
 import Horizontal from "@/components/Horizontal";
-import ExcerciseHint from "@/screens/HomeScreen/activity/excercise-hint";
-import ExcerciseSelection from "@/screens/HomeScreen/activity/excercise-selection";
+import ExerciseHint from "@/screens/HomeScreen/activity/exercise-hint";
+import ExerciseSelection from "@/screens/HomeScreen/activity/exercise-selection";
 import WeatherActivity from "@/screens/HomeScreen/activity/weather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { router } from "expo-router";
@@ -30,11 +30,11 @@ export default function ActivityScreen() {
 
                 <Horizontal height={10} color="rgba(0, 0, 0, 0.03)" />
 
-                <ExcerciseSelection />
+                <ExerciseSelection />
 
                 <Horizontal height={10} color="rgba(0, 0, 0, 0.03)" />
 
-                <ExcerciseHint />
+                <ExerciseHint />
             </ScrollView>
         </View>
     )

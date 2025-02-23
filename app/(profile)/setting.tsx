@@ -2,16 +2,18 @@ import assets from "@/assets"
 import BaseButton from "@/components/Buttons/base-button"
 import Header from "@/components/Headers/header-home"
 import Horizontal from "@/components/Horizontal"
-import { auth } from "@/lib/firebase-config"
+import { auth, firestore } from "@/lib/firebase-config"
 import { useAuth } from "@/providers"
+import { toast } from "@/utils"
+import { doc, updateDoc } from "@firebase/firestore"
 import { router } from "expo-router"
 import { signOut } from "firebase/auth"
 import React, { useState } from "react"
-import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native"
+import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator } from "react-native"
 
 const SettingScreen: React.FC = () => {
     const [loading, setLoading] = useState(false);
-    const { setUser, setUserInformation } = useAuth();
+    const { setUser, setUserInformation, userInformation } = useAuth();
 
     const handleLogout = async () => {
         setLoading(true);
@@ -19,6 +21,26 @@ const SettingScreen: React.FC = () => {
             setUser(null);
             setUserInformation(null);
             setTimeout(() => router.push('/(auth)/login'));
+        }).finally(() => setLoading(false));
+    }
+
+    const handleActive = async () => {
+        if (!userInformation) {
+            toast.error("Lỗi xác thực", "Vui lòng đăng nhập lại!");
+            router.push('/(auth)/login');
+            return;
+        }
+
+        setLoading(true);
+
+        const userRef = doc(firestore, "informations", userInformation.userId);
+        await updateDoc(userRef, { type: 'pro' }).then(() => {
+            const updatedData = {
+                ...userInformation, // Gộp thông tin từ Firestore
+                type: 'pro'
+            };
+            setUserInformation(updatedData);
+            toast.success("Cập nhập thành công", "Đã hoàn thành!");
         }).finally(() => setLoading(false));
     }
 
@@ -49,6 +71,20 @@ const SettingScreen: React.FC = () => {
                             </TouchableOpacity>
                         </View>
                         <Text style={styles.service}>Xóa quảng cáo</Text>
+                        <View style={styles.rowService}>
+                            <Text style={styles.service}>Tính năng Pro</Text>
+                            {
+                                loading ?
+                                    <ActivityIndicator size={20} />
+                                    :
+                                    userInformation?.type === 'free' ?
+                                        <TouchableOpacity onPress={handleActive}>
+                                            <Text style={styles.textButton}>Kích hoạt</Text>
+                                        </TouchableOpacity>
+                                        :
+                                        null
+                            }
+                        </View>
                     </View>
 
                     <Horizontal color="#D9D9D9" height={1} />

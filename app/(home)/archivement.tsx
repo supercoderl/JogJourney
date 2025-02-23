@@ -32,10 +32,11 @@ const tabs = [
 export default function ActivityScreen() {
     const pagerRef = useRef<PagerView>(null);
     const [pageIndex, setPageIndex] = useState(0);
-    const { userInformation } = useAuth();
+    const { userInformation, setUserInformation } = useAuth();
     const [users, setUsers] = useState<any[]>([]);
     const [achivements, setAchievements] = useState<any[]>([]);
     const [pointsGained, setPointsGained] = useState(0);
+    const [loading, setLoading] = useState(false);
 
     const handleTabChange = (index: number) => {
         setPageIndex(index);
@@ -43,6 +44,7 @@ export default function ActivityScreen() {
     };
 
     const fetchData = async () => {
+        setLoading(true);
         try {
             const [achievementsData, usersData, point] = await Promise.all([
                 getMyAchievements(userInformation.userId),
@@ -55,6 +57,8 @@ export default function ActivityScreen() {
             setPointsGained(point ?? 0);
         } catch (error) {
             console.error("Lỗi khi lấy dữ liệu:", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -88,13 +92,20 @@ export default function ActivityScreen() {
                         achivements={achivements}
                         highestPoint={Math.max(...users.map(user => user?.totalPoints ?? 0)) ?? 0}
                         pointsGained={pointsGained}
+                        loading={loading}
                     />
                 </View>
                 <View key="2" style={styles.page}>
-                    <Competition users={[...users].sort((a, b) => (b?.totalPoints ?? 0) - (a?.totalPoints ?? 0))} />
+                    <Competition
+                        users={[...users].sort((a, b) => (b?.totalPoints ?? 0) - (a?.totalPoints ?? 0))}
+                        pointsGained={pointsGained}
+                    />
                 </View>
                 <View key="3" style={[styles.page, { paddingTop: 10 }]}>
-                    <ExchangePoint userInformation={userInformation} />
+                    <ExchangePoint
+                        userInformation={userInformation}
+                        setUserInformation={setUserInformation}
+                    />
                 </View>
             </PagerView>
         </View>

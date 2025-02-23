@@ -42,7 +42,7 @@ export default () => {
                 leftIcon={<Image source={assets.image.add} style={{ width: 24, height: 24 }} />}
                 rightIcon={
                     <View style={{ flexDirection: 'row', gap: 15 }}>
-                        <TouchableOpacity onPress={() => router.push('/(map)/map-record')}>
+                        <TouchableOpacity onPress={() => router.push('/(map)/save')}>
                             <Image source={assets.image.search} style={{ width: 24, height: 24 }} />
                         </TouchableOpacity>
                         <TouchableOpacity>

@@ -13,9 +13,10 @@ interface BaseButtonProps {
 
 const BaseButton: React.FC<BaseButtonProps> = ({ title, buttonStyle, titleStyle, leftIcon, onPress, loading, viewStyle }) => {
     return (
-        <TouchableOpacity style={[styles.container, buttonStyle]} onPress={onPress}>
+        <TouchableOpacity style={[styles.container, { backgroundColor: loading ? '#EBEBE4' : '#19A1CB' }, buttonStyle]} onPress={onPress} disabled={loading}>
             {leftIcon && leftIcon}
-            <View style={[{ alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 4 }, viewStyle]}>
+            <View
+                style={[{ alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 4 }, viewStyle]}>
                 {loading && <ActivityIndicator color="white" />}
                 <Text style={[styles.title, titleStyle]}>{title}</Text>
             </View>
@@ -27,7 +28,6 @@ export default BaseButton;
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#19A1CB',
         width: '100%',
         textAlign: 'center',
         borderRadius: 10,

@@ -6,7 +6,7 @@ import { formatTimeAndDay, getAchievementStatusName } from "@/utils";
 import screen from "@/utils/screen";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React, { useEffect, useState } from "react"
-import { FlatList, Image, StyleSheet, Text, View } from "react-native"
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from "react-native"
 import { Shadow } from "react-native-shadow-2";
 
 interface ArchivementMeProps {
@@ -15,16 +15,17 @@ interface ArchivementMeProps {
     achivements: any[];
     highestPoint: number;
     pointsGained: number;
+    loading: boolean;
 }
 
 const AchievementItem = ({ item }: { item: any }) => {
     const [exercise, setExercise] = useState<any>(null);
 
     useEffect(() => {
-        if (item?.excerciseId) {
-            fetchExerciseById(item?.excerciseId).then(setExercise);
+        if (item?.exerciseId) {
+            fetchExerciseById(item?.exerciseId).then(setExercise);
         }
-    }, [item?.excerciseId]);
+    }, [item?.exerciseId]);
 
     return (
         <View style={{ backgroundColor: 'white', paddingVertical: 2, paddingHorizontal: 10 }}>
@@ -44,7 +45,7 @@ const AchievementItem = ({ item }: { item: any }) => {
     );
 };
 
-const ArchivementMe: React.FC<ArchivementMeProps> = ({ onChangePage, userInformation, achivements, highestPoint, pointsGained }) => {
+const ArchivementMe: React.FC<ArchivementMeProps> = ({ onChangePage, userInformation, achivements, highestPoint, pointsGained, loading }) => {
 
     return (
         <View style={styles.container}>
@@ -67,11 +68,11 @@ const ArchivementMe: React.FC<ArchivementMeProps> = ({ onChangePage, userInforma
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 5 }}>
                         <View>
                             <Text style={styles.extraText}>Điểm cao NH</Text>
-                            <Text style={styles.extraScore}>{highestPoint}</Text>
+                            {loading ? <ActivityIndicator size={20} /> : <Text style={styles.extraScore}>{highestPoint}</Text>}
                         </View>
                         <View>
                             <Text style={styles.extraText}>Điểm hôm nay</Text>
-                            <Text style={styles.extraScore}>{pointsGained > 0 ? `+${pointsGained}` : 0}</Text>
+                            {loading ? <ActivityIndicator size={20} /> : <Text style={styles.extraScore}>{pointsGained > 0 ? `+${pointsGained}` : 0}</Text>}
                         </View>
                     </View>
                 </View>

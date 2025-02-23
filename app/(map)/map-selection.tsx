@@ -54,7 +54,9 @@ const MapSelectionScreen: React.FC = () => {
                                 latitudeDelta: 0.008,
                                 longitudeDelta: 0.009,
                             }}
-                            onPress={() => router.push({ pathname: '/(map)/map-record', params: map })}
+                            onPress={() => router.push({ pathname: '/(map)/map-record', params: {
+                                map: JSON.stringify(map)
+                            } })}
                         >
                             <Polyline
                                 coordinates={giaDinhParkBoundary}

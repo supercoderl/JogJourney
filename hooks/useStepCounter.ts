@@ -27,13 +27,11 @@ const useStepCounter = () => {
     };
 
     const startTracking = () => {
-        console.log('start');
         setIsRunning(true);
         setStartTime(Date.now() - elapsedTime);
     };
 
     const pauseTracking = () => {
-        console.log("pause");
         setIsRunning(false);
         setElapsedTime(Date.now() - (startTime ?? 0));
     };

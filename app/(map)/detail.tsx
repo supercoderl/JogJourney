@@ -5,20 +5,25 @@ import screen from "@/utils/screen"
 import { router, useLocalSearchParams } from "expo-router"
 import React, { useEffect, useState } from "react"
 import { TouchableOpacity, View, Image, Text, StyleSheet, ScrollView } from "react-native"
-import MapView from "react-native-maps"
+import MapView, { Marker } from "react-native-maps"
 import { LineChart } from "react-native-gifted-charts";
 import BaseButton from "@/components/Buttons/base-button"
 import InformationDetail from "@/screens/HomeScreen/detail/information"
 import { useAuth } from "@/providers"
-import { addDoc, collection } from "@firebase/firestore"
+import { addDoc, collection, doc, setDoc, updateDoc } from "@firebase/firestore"
 import { firestore } from "@/lib/firebase-config"
+import useCurrentLocation from "@/hooks/useLocation"
 
 const DetailScreen: React.FC = () => {
-    const { user } = useAuth();
+    const { user, userInformation, setUserInformation } = useAuth();
     const params = useLocalSearchParams();
     const [loading, setLoading] = useState(false);
     const [result, setResult] = useState<any>(null);
     const [map, setMap] = useState<any>(null);
+    const [infoUser, setInfoUser] = useState<any[]>([]);
+    const [infoData, setInfoData] = useState<any[]>([]);
+    const [type, setType] = useState<string>('record');
+    const { location } = useCurrentLocation();
 
     const d1 = [
         { value: 88, label: '8:30', showXAxisIndex: true },
@@ -39,50 +44,12 @@ const DetailScreen: React.FC = () => {
         { value: 94 },
     ];
 
-    const infoData = [
-        {
-            value: 50,
-            text: 'Thời gian chạy (phút)'
-        },
-        {
-            value: 11,
-            text: 'Quãng đường(km)'
-        },
-        {
-            value: 7000,
-            text: 'Bước chân \n\n'
-        },
-        {
-            value: 8000,
-            text: 'Năng lượng tiêu hao (kcal)'
-        }
-    ];
-
-    const infoUser = [
-        {
-            value: 128,
-            text: 'Nhịp tim trung bình'
-        },
-        {
-            value: 149,
-            text: 'Nhịp tim cao nhất \n\n'
-        },
-        {
-            value: 8.2,
-            text: 'Tốc độ trung bình (km/h)'
-        },
-        {
-            value: 10.1,
-            text: 'Tốc độ cao nhất (km/h)'
-        }
-    ]
-
     const handleSave = async () => {
         const body = {
             userId: user.uid,
-            mapId: map?.id,
-            levelId: '',
-            excerciseId: 1,
+            mapId: map?.id ?? null,
+            levelId: result?.level?.id ?? null,
+            exerciseId: result?.exerciseId,
             status: true,
             completedAt: new Date(),
             elapsedTime: result?.elapsedTime ?? 0,
@@ -94,21 +61,95 @@ const DetailScreen: React.FC = () => {
 
         setLoading(true);
 
-        await addDoc(collection(firestore, 'challenges'), body).then(() => {
-            router.push('/(map)/save')
+        await addDoc(collection(firestore, 'challenges'), body).then(async () => {
+            const promises = [
+                ...(result?.level ? [updateDailyProgress(result.level)] : []),
+                ...(result?.level ? [updateUserInformation(result.level)] : [])
+            ];
+
+            await Promise.allSettled(promises);
+            router.push('/(map)/save');
+            if (result?.level) await updateUserInformation(result?.level);
+        }).catch(err => console.log(err)).finally(() => setLoading(false));
+    }
+
+    const updateUserInformation = async (level: any) => {
+        await setDoc(doc(firestore, 'informations', userInformation?.userId), {
+            ...userInformation,
+            totalPoints: (userInformation?.totalPoints ?? 0) + (level?.score ?? 0)
+        }).then(() => {
+            setUserInformation({
+                ...userInformation,
+                totalPoints: (userInformation?.totalPoints ?? 0) + (level?.score ?? 0)
+            });
         }).finally(() => setLoading(false));
+    }
+
+    const updateDailyProgress = async (level: any) => {
+        await addDoc(collection(firestore, 'dailyProgresses'), {
+            userId: userInformation.userId,
+            date: new Date(),
+            pointsGained: (level?.score ?? 0)
+        });
     }
 
     useEffect(() => {
         if (params) {
             if (params.result && typeof params.result === 'string') {
                 const parsedResult = JSON.parse(params.result);
-                setResult((prev: any) => (JSON.stringify(prev) !== JSON.stringify(parsedResult) ? parsedResult : prev));
+                setResult((prev: any) => {
+                    if (JSON.stringify(prev) !== JSON.stringify(parsedResult)) {
+                        setInfoData([
+                            {
+                                value: ((parsedResult?.elapsedTime || 0) / 60).toFixed(0), // Lấy từ result nếu có
+                                text: 'Thời gian chạy (phút)'
+                            },
+                            {
+                                value: ((parsedResult.distance || 0) / 1000).toFixed(3),
+                                text: 'Quãng đường (km)'
+                            },
+                            {
+                                value: 0,
+                                text: 'Bước chân \n\n'
+                            },
+                            {
+                                value: (parsedResult.caloriesBurned || 0).toFixed(2),
+                                text: 'Năng lượng tiêu hao (kcal)'
+                            }
+                        ]);
+
+                        setInfoUser([
+                            {
+                                value: 0,
+                                text: 'Nhịp tim trung bình'
+                            },
+                            {
+                                value: 0,
+                                text: 'Nhịp tim cao nhất \n\n'
+                            },
+                            {
+                                value: ((parsedResult.speed ?? 1.2) * 3.6).toFixed(2),
+                                text: 'Tốc độ trung bình (km/h)'
+                            },
+                            {
+                                value: ((parsedResult.maxSpeed ?? 1.2) * 3.6).toFixed(2),
+                                text: 'Tốc độ cao nhất (km/h)'
+                            }
+                        ])
+
+                        return parsedResult; // Cập nhật result
+                    }
+                    return prev;
+                });
             }
 
             if (params.map && typeof params.map === 'string') {
                 const parsedMap = JSON.parse(params.map);
                 setMap((prev: any) => (JSON.stringify(prev) !== JSON.stringify(parsedMap) ? parsedMap : prev));
+            }
+
+            if (params.type && typeof params.type === 'string') {
+                setType((prev: any) => (prev !== params.type ? params.type : prev));
             }
         }
     }, [params]);
@@ -130,10 +171,24 @@ const DetailScreen: React.FC = () => {
                     <View style={{ width: '100%', height: screen.width / 1.5625, borderRadius: 15, overflow: 'hidden' }}>
                         <MapView
                             style={{ width: '100%', height: '100%' }}
-                        />
+                            region={{
+                                latitude: location?.latitude ?? 0,
+                                longitude: location?.longitude ?? 0,
+                                latitudeDelta: 0.0001,
+                                longitudeDelta: 0.001,
+                            }}
+                            zoomEnabled={false}
+                            scrollEnabled={false}
+                        >
+                            <Marker
+                                coordinate={{ latitude: location?.latitude ?? 0, longitude: location?.longitude ?? 0 }}
+                                title=""
+                                description=""
+                            />
+                        </MapView>
                     </View>
 
-                    {params?.map && Object.keys(params?.map).length > 0 && (
+                    {params?.map && typeof params.map === "object" && Object.keys(params?.map).length > 0 && (
                         <View style={{ paddingBlock: 10, gap: 5 }}>
                             <Text style={{ fontWeight: 'bold', fontSize: 24, color: '#342E2E' }}>{map?.name ?? ''}</Text>
                             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
@@ -186,7 +241,7 @@ const DetailScreen: React.FC = () => {
                     </View>
                 </View>
 
-                <BaseButton
+                {type === 'record' && <BaseButton
                     title="Lưu lại"
                     onPress={handleSave}
                     buttonStyle={{
@@ -195,7 +250,7 @@ const DetailScreen: React.FC = () => {
                     }}
                     titleStyle={{ fontWeight: 'bold', fontSize: 24 }}
                     loading={loading}
-                />
+                />}
             </ScrollView>
         </View>
     )

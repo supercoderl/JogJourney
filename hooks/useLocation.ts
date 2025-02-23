@@ -72,8 +72,6 @@ const useCurrentLocation = () => {
                 }
               );
 
-              console.log(dist);
-
               if (dist >= 1) {
                 setDistance((d) => d + dist);
               }
@@ -109,7 +107,6 @@ const useCurrentLocation = () => {
   };
 
   const pauseTracking = () => {
-    console.log("Paused");
     setIsPaused(true);
 
     if (watchId) {

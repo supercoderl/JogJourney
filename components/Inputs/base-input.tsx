@@ -1,16 +1,15 @@
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React from "react"
-import { StyleSheet, TextInput, TextInputProps, View } from "react-native"
-import screen from "@/utils/screen";
+import { StyleSheet, TextInput, TextInputProps, View, ViewStyle } from "react-native"
 
 interface BaseInputProps extends TextInputProps {
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
+    viewStyle?: ViewStyle;
 }
 
-const BaseInput: React.FC<BaseInputProps> = ({ leftIcon, rightIcon, ...props }) => {
+const BaseInput: React.FC<BaseInputProps> = ({ leftIcon, rightIcon, viewStyle, ...props }) => {
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, viewStyle]}>
             {leftIcon && leftIcon}
             <TextInput style={styles.input} {...props} />
             {rightIcon && rightIcon}

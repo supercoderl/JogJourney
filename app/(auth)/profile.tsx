@@ -14,6 +14,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import * as ImagePicker from 'expo-image-picker';
 import { uploadImage } from "@/helpers/api"
+import BaseSelect from "@/components/Selects/base-select";
 
 export default function ProfileScreen() {
     const { user, userInformation, setUserInformation } = useAuth();
@@ -51,7 +52,8 @@ export default function ProfileScreen() {
                 gender,
                 height: Number(height),
                 weight: (weight),
-                avatar: image
+                avatar: image,
+                type: 'free'
             };
             setUserInformation(updatedData);
             router.push('/(home)');
@@ -148,14 +150,12 @@ export default function ProfileScreen() {
                                     onChangeText={handleChange("birthday")}
                                     onBlur={handleBlur("birthday")}
                                 />
-                                <BaseInput
+                                <BaseSelect
                                     leftIcon={<Image source={assets.image.gender} style={{ width: 24, height: 24 }} />}
-                                    placeholder="Giới tính"
-                                    placeholderTextColor="#8A8A8A"
-                                    autoCapitalize="none"
-                                    value={values.gender}
-                                    onChangeText={handleChange("gender")}
-                                    onBlur={handleBlur("gender")}
+                                    data={[{ value: 'Nam', label: 'Nam' }, { value: 'Nữ', label: 'Nữ' }, { value: 'Khác', label: 'Khác' }]}
+                                    selected={values.gender}
+                                    placeHolderText="Giới tính"
+                                    onSelect={handleChange("gender")}
                                 />
                                 <BaseInput
                                     leftIcon={<Image source={assets.image.height} style={{ width: 24, height: 24 }} />}
