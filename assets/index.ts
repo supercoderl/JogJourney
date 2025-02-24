@@ -52,7 +52,12 @@ import medal from './images/medal.png';
 import run from './images/run.png';
 import bike from './images/bike.png';
 
+import recording from './animations/recording.json';
+
 export default {
+    animation: {
+        recording
+    },
     image: {
         background,
         logo,

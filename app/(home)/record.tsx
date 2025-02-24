@@ -9,8 +9,9 @@ import { toast } from "@/utils";
 import screen from "@/utils/screen";
 import { router } from "expo-router";
 import React, { useRef, useState } from "react";
-import { StyleSheet, TouchableOpacity, View, Image, Text, Animated, Modal } from "react-native";
+import { StyleSheet, TouchableOpacity, View, Image, Text, Animated, Modal, ActivityIndicator } from "react-native";
 import MapView, { Circle } from "react-native-maps";
+import LottieView from 'lottie-react-native';
 
 export default function RecordScreen() {
     const scrollY = useRef(new Animated.Value(0)).current;
@@ -26,7 +27,9 @@ export default function RecordScreen() {
         isPaused,
         elapsedTime,
         maxSpeed,
-        isTracking
+        isTracking,
+        loading,
+        isRecording
     } = useCurrentLocation();
     const { userInformation } = useAuth();
 
@@ -106,16 +109,33 @@ export default function RecordScreen() {
                         isTracking={isTracking}
                         border={
                             <View style={styles.border}>
-                                <TouchableOpacity onPress={() => {
-                                    if (!location) {
-                                        toast.info("Khoan đã", "Chờ cho bản đồ được tải xong nhé!");
-                                        return;
-                                    }
-                                    toast.info("Bắt đầu", "Hệ thống chuẩn bị bấm giờ trong giây lát!");
-                                    startTracking();
-                                }}>
-                                    <Image source={assets.image.recorder} style={{ width: 72, height: 72 }} />
-                                </TouchableOpacity>
+                                {loading ?
+                                    <ActivityIndicator size={50} />
+                                    : isRecording ?
+                                        <LottieView
+                                            autoPlay
+                                            loop
+                                            style={{
+                                                width: screen.width / 2,
+                                                height: screen.width / 2,
+                                            }}
+                                            // Find more Lottie files at https://lottiefiles.com/featured
+                                            source={assets.animation.recording}
+                                        />
+                                        :
+                                        (
+                                            <TouchableOpacity onPress={() => {
+                                                if (!location) {
+                                                    toast.info("Khoan đã", "Chờ cho bản đồ được tải xong nhé!");
+                                                    return;
+                                                }
+                                                toast.info("Bắt đầu", "Hệ thống chuẩn bị bấm giờ trong giây lát!");
+                                                startTracking();
+                                            }}>
+                                                <Image source={assets.image.recorder} style={{ width: 72, height: 72 }} />
+                                            </TouchableOpacity>
+                                        )
+                                }
                             </View>
                         }
                         handlePause={() => {

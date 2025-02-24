@@ -1,6 +1,7 @@
 import assets from "@/assets"
 import Loading from "@/components/Loadings/loading"
 import { firestore } from "@/lib/firebase-config"
+import { ensureHttps } from "@/utils"
 import { collection, getDocs, query } from "@firebase/firestore"
 import { router } from "expo-router"
 import React, { useEffect, useState } from "react"
@@ -32,7 +33,7 @@ const ExerciseHint = () => {
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
                         <TouchableOpacity style={{ borderRadius: 10 }} onPress={() => router.push({ pathname: '/(map)/map-selection', params: item })}>
-                            <Image source={item?.image ? { uri: item?.image } : assets.image.image} style={styles.image} />
+                            <Image source={item?.image ? { uri: ensureHttps(item?.image) } : assets.image.image} style={styles.image} />
                             <View style={{ backgroundColor: '#19A1CB', borderBottomLeftRadius: 10, borderBottomRightRadius: 10, padding: 15 }}>
                                 <Text style={{ fontWeight: 'bold', fontFamily: 'Inter', fontSize: 20, color: '#07476D' }}>GOAL {item?.distance ?? '5'}km</Text>
                                 <Text style={{ fontWeight: 'bold', fontFamily: 'Inter', fontSize: 20, color: 'white' }}>{item?.name ?? 'Công viên gia định'}</Text>

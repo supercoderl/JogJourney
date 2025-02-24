@@ -2,7 +2,7 @@ import assets from "@/assets";
 import Header from "@/components/Headers/header-home";
 import Horizontal from "@/components/Horizontal";
 import { useAuth } from "@/providers";
-import { calculateAge } from "@/utils";
+import { calculateAge, ensureHttps } from "@/utils";
 import screen from "@/utils/screen";
 import { router } from "expo-router";
 import React from "react";
@@ -50,7 +50,7 @@ export default function ProfileScreen() {
                 <View style={styles.informationWrapper}>
                     <Text style={styles.title}>Thông tin cá nhân</Text>
                     <Image
-                        source={userInformation?.avatar ? { uri: userInformation?.avatar } : assets.image.avatar}
+                        source={userInformation?.avatar ? { uri: ensureHttps(userInformation?.avatar) } : assets.image.avatar}
                         style={styles.avatar}
                     />
                     <Text style={styles.name}>{userInformation?.fullname ?? 'Nguyễn Văn A'}</Text>

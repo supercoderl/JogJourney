@@ -4,7 +4,7 @@ import BaseInput from "@/components/Inputs/base-input";
 import Loading from "@/components/Loadings/loading";
 import { firestore } from "@/lib/firebase-config";
 import { useAuth } from "@/providers";
-import { toast } from "@/utils";
+import { ensureHttps, toast } from "@/utils";
 import screen from "@/utils/screen";
 import { doc, setDoc } from "@firebase/firestore";
 import { router } from "expo-router";
@@ -43,7 +43,9 @@ export default function ProfileScreen() {
             gender,
             height: Number(height),
             weight: Number(weight),
-            avatar: image
+            avatar: image,
+            totalPoints: 0,
+            type: 'free'
         }).then(() => {
             const updatedData = {
                 ...userInformation, // Gộp thông tin từ Firestore
@@ -53,6 +55,7 @@ export default function ProfileScreen() {
                 height: Number(height),
                 weight: (weight),
                 avatar: image,
+                totalPoints: 0,
                 type: 'free'
             };
             setUserInformation(updatedData);
@@ -101,7 +104,7 @@ export default function ProfileScreen() {
                 {/* Avatar */}
                 <View style={styles.avatarContainer}>
                     <Image
-                        source={image ? { uri: image } : assets.image.avatar}
+                        source={image ? { uri: ensureHttps(image) } : assets.image.avatar}
                         style={styles.avatar}
                     />
                     {/* Nút camera */}

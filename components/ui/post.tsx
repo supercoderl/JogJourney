@@ -5,6 +5,7 @@ import { View, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedba
 import MapView, { Marker } from 'react-native-maps';
 import BaseButton from "../Buttons/base-button";
 import OutsidePressHandler from 'react-native-outside-press';
+import { ensureHttps } from "@/utils";
 
 interface PostProps {
     post: any;
@@ -38,7 +39,7 @@ const PostScreen: React.FC<PostProps> = ({ post, userInformation }) => {
                 <View style={styles.userWrapper}>
                     <View style={styles.informationWrapper}>
                         <Image
-                            source={userInformation?.avatar ? { uri: userInformation?.avatar } : assets.image.avatar}
+                            source={userInformation?.avatar ? { uri: ensureHttps(userInformation?.avatar) } : assets.image.avatar}
                             style={styles.avatar}
                         />
                         <Text style={styles.name}>{userInformation?.name ?? userInformation?.fullname ?? 'Dương Kha'}</Text>

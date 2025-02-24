@@ -2,11 +2,11 @@ import assets from "@/assets";
 import BaseButton from "@/components/Buttons/base-button";
 import Horizontal from "@/components/Horizontal";
 import { fetchExerciseById } from "@/helpers/api";
-import { formatTimeAndDay, getAchievementStatusName } from "@/utils";
+import { ensureHttps, formatTimeAndDay, getAchievementStatusName } from "@/utils";
 import screen from "@/utils/screen";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import React, { useEffect, useState } from "react"
-import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from "react-native"
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import { Shadow } from "react-native-shadow-2";
 
 interface ArchivementMeProps {
@@ -51,12 +51,14 @@ const ArchivementMe: React.FC<ArchivementMeProps> = ({ onChangePage, userInforma
         <View style={styles.container}>
             <View style={styles.card}>
                 <Shadow>
-                    <Image source={userInformation?.avatar ? { uri: userInformation.avatar } : assets.image.avatar} style={styles.avatar} />
+                    <Image source={userInformation?.avatar ? { uri: ensureHttps(userInformation.avatar) } : assets.image.avatar} style={styles.avatar} />
                 </Shadow>
                 <View style={{ width: '50%' }}>
                     <Text style={styles.title}>Điểm:</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Text style={styles.mainScore}>{userInformation?.totalPoints ?? 0}</Text>
+                        <TouchableOpacity>
+                            <Text style={styles.mainScore}>{userInformation?.totalPoints ?? 0}</Text>
+                        </TouchableOpacity>
                         <BaseButton
                             title="Đổi điểm"
                             onPress={onChangePage}

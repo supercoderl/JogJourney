@@ -2,6 +2,7 @@ import assets from "@/assets"
 import BaseButton from "@/components/Buttons/base-button"
 import { firestore } from "@/lib/firebase-config"
 import { useAuth } from "@/providers"
+import { ensureHttps } from "@/utils"
 import { addDoc, collection, doc, getDocs, query, where } from "@firebase/firestore"
 import React, { useEffect, useState } from "react"
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
@@ -20,7 +21,7 @@ const ProposeItem = ({ user, userId, refreshFollowList }: { user: any, userId: s
 
     return (
         <View style={styles.proposeItemWrapper}>
-            <Image source={user?.avatar ? { uri: user?.avatar } : assets.image.account_box} style={styles.account_box} />
+            <Image source={user?.avatar ? { uri: ensureHttps(user?.avatar) } : assets.image.account_box} style={styles.account_box} />
             <View>
                 <Text style={styles.name}>{user?.fullname ?? 'Lê Vân Triều'}</Text>
                 <Text style={styles.follower}>22 người theo dõi</Text>
@@ -41,7 +42,7 @@ const FollowerList = ({ user }: { user: any }) => {
     return (
         <View style={styles.followerContainer}>
             <View style={{ flexDirection: 'row', gap: 10, flex: 1, alignItems: 'center', paddingLeft: 30 }}>
-                <Image source={user?.avatar ? { uri: user?.avatar } : assets.image.avatar} style={styles.avatar} />
+                <Image source={user?.avatar ? { uri: ensureHttps(user?.avatar) } : assets.image.avatar} style={styles.avatar} />
                 <Text style={{ fontWeight: 'bold', fontFamily: 'Inter', fontSize: 16, color: '#342E2E' }}>{user?.fullname ?? 'Dương Kha'}</Text>
             </View>
             <TouchableOpacity>

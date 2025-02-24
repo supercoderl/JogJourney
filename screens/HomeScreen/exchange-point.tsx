@@ -2,7 +2,7 @@ import assets from "@/assets";
 import BaseButton from "@/components/Buttons/base-button";
 import Loading from "@/components/Loadings/loading";
 import { firestore } from "@/lib/firebase-config";
-import { toast } from "@/utils";
+import { ensureHttps, toast } from "@/utils";
 import screen from "@/utils/screen";
 import { collection, doc, getDocs, setDoc } from "@firebase/firestore";
 import React, { useEffect, useState } from "react"
@@ -18,6 +18,7 @@ const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation, setUserI
     const [loading, setLoading] = useState(false);
     const [exchangeLoading, setExchangeLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
+    const [item, setItem] = useState<any>(null);
 
     const getItems = async () => {
         setLoading(true);
@@ -26,15 +27,24 @@ const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation, setUserI
         }).finally(() => setLoading(false));
     }
 
-    const handleExchange = async (item: any) => {
+    const handleExchange = async () => {
         setExchangeLoading(true);
 
-        if (userInformation?.totalPoints < item?.pointsCost) {
-            toast.error("Lỗi", "Bạn không đủ điểm để đổi quà này.");
+        if(!userInformation || !item) {
+            toast.error("Lỗi", "Lỗi hệ thống, vui lòng kiểm tra lại.");
+            setShowModal(false);
+            setExchangeLoading(false);
             return;
         }
 
-        const point = userInformation?.totalPoints - item?.pointsCost;
+        if (userInformation?.totalPoints < item?.pointsCost) {
+            toast.error("Lỗi", "Bạn không đủ điểm để đổi quà này.");
+            setShowModal(false);
+            setExchangeLoading(false);
+            return;
+        }
+
+        const point = (userInformation?.totalPoints ?? 0) - (item?.pointsCost ?? 0);
         await setDoc(doc(firestore, "informations", userInformation?.userId), {
             ...userInformation,
             totalPoints: point
@@ -43,7 +53,10 @@ const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation, setUserI
                 ...userInformation,
                 totalPoints: point
             });
-        }).finally(() => setExchangeLoading(false));
+        }).finally(() => {
+            setExchangeLoading(false);
+            setShowModal(false);
+        });
     }
 
     useEffect(() => {
@@ -53,7 +66,7 @@ const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation, setUserI
     return (
         <View style={styles.container}>
             <View style={styles.card}>
-                <Image source={userInformation?.avatar ? { uri: userInformation?.avatar } : assets.image.avatar} style={styles.avatar} />
+                <Image source={userInformation?.avatar ? { uri: ensureHttps(userInformation?.avatar) } : assets.image.avatar} style={styles.avatar} />
                 <View style={{ width: '50%' }}>
                     <Text style={styles.title}>Điểm đang có:</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -77,14 +90,17 @@ const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation, setUserI
                                 paddingHorizontal: 10,
                                 gap: 25
                             }}>
-                                <Image source={item?.imageUrl ? { uri: item?.imageUrl } : assets.image.self_improvement} style={styles.prize} />
+                                <Image source={item?.imageUrl ? { uri: ensureHttps(item?.imageUrl) } : assets.image.self_improvement} style={styles.prize} />
                                 <View style={{ flex: 1, gap: 5 }}>
                                     <Text style={[styles.extraText, { fontWeight: 'bold' }]}>{item?.category ?? 'Voucher'}</Text>
                                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'flex-start' }}>
                                         <Text style={styles.name}>{item?.title ?? 'Giảm giá khóa học Yoga cho nữ 30%'}</Text>
                                         <BaseButton
                                             title={item?.pointsCost ?? 0}
-                                            onPress={() => setShowModal(true)}
+                                            onPress={() => {
+                                                setItem(item);
+                                                setShowModal(true);
+                                            }}
                                             buttonStyle={{ alignSelf: 'flex-start', width: 'auto', paddingBlock: 4, paddingHorizontal: 20 }}
                                             titleStyle={{ fontWeight: 'bold', fontSize: 14 }}
                                             viewStyle={{ alignSelf: 'flex-start' }}

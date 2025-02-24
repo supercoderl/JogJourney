@@ -90,7 +90,10 @@ export default function ActivityScreen() {
                         userInformation={userInformation}
                         onChangePage={() => handleTabChange(2)}
                         achivements={achivements}
-                        highestPoint={Math.max(...users.map(user => user?.totalPoints ?? 0)) ?? 0}
+                        highestPoint={users.reduce((max, user) => {
+                            const points = user?.totalPoints ?? 0;
+                            return isNaN(points) ? max : Math.max(max, points);
+                        }, 0)}
                         pointsGained={pointsGained}
                         loading={loading}
                     />

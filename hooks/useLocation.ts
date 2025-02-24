@@ -15,6 +15,8 @@ const useCurrentLocation = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [timer, setTimer] = useState<NodeJS.Timeout | null>(null); // Bộ đếm thời gian
   const [maxSpeed, setMaxSpeed] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
 
   const requestPermissions = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -44,6 +46,8 @@ const useCurrentLocation = () => {
     const hasPermission = await requestPermissions();
     if (!hasPermission) return;
 
+    setLoading(true);
+
     // Bắt đầu đếm thời gian mỗi giây
     const interval = setInterval(() => {
       setElapsedTime((prev) => prev + 1);
@@ -59,6 +63,8 @@ const useCurrentLocation = () => {
       (newLocation) => {
         if (isPaused) return;
 
+        setLoading(false);
+        setIsRecording(true);
         setLocation(newLocation.coords);
         setLocations((prev) => {
           if (prev.length > 0) {
@@ -118,6 +124,8 @@ const useCurrentLocation = () => {
     setLocations([]); // Reset danh sách location
     setIsPaused(false); // Reset trạng thái pause
     setMaxSpeed(0);
+    setLoading(false);
+    setIsRecording(false);
   };
 
   const pauseTracking = () => {
@@ -127,6 +135,8 @@ const useCurrentLocation = () => {
       watchId.remove();
       setWatchId(null);
     }
+
+    setIsRecording(false);
 
     if (timer) {
       clearInterval(timer);
@@ -138,6 +148,7 @@ const useCurrentLocation = () => {
     const hasPermission = await requestPermissions();
     if (!hasPermission) return;
 
+    setLoading(true);
     setIsPaused(false);
 
     if (!timer) {
@@ -154,7 +165,9 @@ const useCurrentLocation = () => {
         distanceInterval: 0.1,
       },
       (newLocation) => {
+        setLoading(false);
         setLocation(newLocation.coords);
+        setIsRecording(true);
         setLocations((prev) => {
           if (prev.length > 0) {
             const lastLocation = prev[prev.length - 1];
@@ -223,7 +236,9 @@ const useCurrentLocation = () => {
     caloriesBurned,
     pauseTracking,
     resumeTracking,
-    isPaused
+    isPaused,
+    loading,
+    isRecording
   };
 };
 

@@ -4,7 +4,7 @@ import Header from "@/components/Headers/header-home"
 import BaseInput from "@/components/Inputs/base-input"
 import { firestore } from "@/lib/firebase-config"
 import { useAuth } from "@/providers"
-import { toast } from "@/utils"
+import { ensureHttps, toast } from "@/utils"
 import screen from "@/utils/screen"
 import { doc, updateDoc } from "@firebase/firestore"
 import { router } from "expo-router"
@@ -109,7 +109,7 @@ const EditInformationScreen: React.FC = () => {
                     {/* Avatar */}
                     <View style={styles.avatarContainer}>
                         <Image
-                            source={image ? { uri: image } : assets.image.avatar}
+                            source={image ? { uri: ensureHttps(image) } : assets.image.avatar}
                             style={styles.avatar}
                         />
                         {/* Nút camera */}

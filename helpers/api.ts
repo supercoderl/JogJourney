@@ -105,6 +105,33 @@ export const getTodayPoints = async (userId: string) => {
     }
 };
 
+export const getPoints = async (userId: string) => {
+    try {
+        const now = new Date();
+        const startOfDay = new Date(now.setHours(0, 0, 0, 0));
+        const endOfDay = new Date(now.setHours(23, 59, 59, 999));
+
+        const q = query(
+            collection(firestore, "dailyProgresses"),
+            where("userId", "==", userId),
+            where("date", ">=", startOfDay),
+            where("date", "<=", endOfDay)
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        let totalPoints = 0;
+        querySnapshot.forEach((doc) => {
+            totalPoints += doc.data().pointsGained || 0;
+        });
+
+        return totalPoints;
+    } catch (error) {
+        console.error("Lỗi khi lấy dailyProgresses:", error);
+        return 0;
+    }
+};
+
 export const getChallengesByUser = async (userId: string) => {
     try {
         const challengeQuery = query(collection(firestore, "challenges"), where("userId", "==", userId));

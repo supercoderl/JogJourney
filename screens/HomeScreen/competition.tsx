@@ -1,6 +1,6 @@
 import assets from "@/assets";
 import Star from "@/components/ui/star";
-import { getRandomColor } from "@/utils";
+import { ensureHttps, getRandomColor } from "@/utils";
 import screen from "@/utils/screen";
 import React from "react"
 import { FlatList, Image, StyleSheet, Text, View } from "react-native"
@@ -14,7 +14,7 @@ const Competition: React.FC<CompetitionProps> = ({ users, pointsGained }) => {
     return (
         <View style={styles.container}>
             <View style={styles.card}>
-                <Image source={users && users.length > 0 ? users[0]?.avatar ? { uri: users[0]?.avatar } : assets.image.avatar : assets.image.avatar} style={styles.avatar} />
+                <Image source={users && users.length > 0 ? users[0]?.avatar ? { uri: ensureHttps(users[0]?.avatar) } : assets.image.avatar : assets.image.avatar} style={styles.avatar} />
                 <View style={{ width: '50%' }}>
                     <Text style={styles.title}>Xếp hạng tuần này</Text>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -48,7 +48,7 @@ const Competition: React.FC<CompetitionProps> = ({ users, pointsGained }) => {
                         }}>
                             <Star size={37} text={String(index + 1)} color={getRandomColor()} />
                             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                                <Image source={item?.avatar ? { uri: item?.avatar } : assets.image.avatar} style={{ width: 40, height: 40, borderRadius: screen.width }} />
+                                <Image source={item?.avatar ? { uri: ensureHttps(item?.avatar) } : assets.image.avatar} style={{ width: 40, height: 40, borderRadius: screen.width }} />
                                 <View style={{}}>
                                     <Text style={styles.name}>{item?.fullname ?? 'Nguyễn Văn A'}</Text>
                                     <Text style={[styles.extraText, { color: '#19A1CB', fontWeight: 'bold' }]}>{item?.totalPoints ?? 0} điểm</Text>

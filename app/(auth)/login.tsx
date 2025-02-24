@@ -9,7 +9,6 @@ import React, { useState } from "react";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { Formik } from 'formik';
 import { toast } from "@/utils";
-import { useTogglePasswordVisibility } from "@/hooks";
 import { Link } from "expo-router";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
