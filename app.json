@@ -2,7 +2,7 @@
   "expo": {
     "name": "JogJourney",
     "slug": "jog-journey",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/logo.jpg",
     "scheme": "myapp",
@@ -25,7 +25,7 @@
         }
       },
       "package": "com.k16.jogjourney",
-      "versionCode": 2,
+      "versionCode": 3,
       "permissions": [
         "android.permission.ACTIVITY_RECOGNITION",
         "android.permission.ACCESS_COARSE_LOCATION",

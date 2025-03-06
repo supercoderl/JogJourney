@@ -8,6 +8,7 @@ const AppNavigator: React.FC = () => {
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="(profile)" options={{ headerShown: false }} />
             <Stack.Screen name="(map)" options={{ headerShown: false }} />
+            <Stack.Screen name="(communication)" options={{ headerShown: false }} />
         </Stack>
     );
 };

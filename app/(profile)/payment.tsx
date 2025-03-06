@@ -13,12 +13,11 @@ import Header from '@/components/Headers/header-home';
 import { firestore } from '@/lib/firebase-config';
 import { useAuth } from '@/providers';
 import { toast } from '@/utils';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import screen from '@/utils/screen';
 import { doc, updateDoc } from '@firebase/firestore';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
-    Alert,
     TouchableOpacity,
     View,
     Image,
@@ -31,6 +30,7 @@ import { WebView } from 'react-native-webview';
 export default function PaymentScreen() {
     const webViewRef = useRef(null);
     const { url } = useLocalSearchParams();
+    const [isSuccess, setIsSuccess] = useState(false);
 
     const { userInformation, setUserInformation } = useAuth();
 
@@ -59,50 +59,64 @@ export default function PaymentScreen() {
                 type: 'pro'
             };
             setUserInformation(updatedData);
-            toast.success("Cập nhập thành công", "Đã hoàn thành!");
-        }).finally(() => router.back());
+            setIsSuccess(true);
+        });
     }
 
     return (
         <View style={styles.container}>
             <Header
                 leftIcon={
-                    <TouchableOpacity onPress={() => router.replace('/(home)')}>
+                    <TouchableOpacity onPress={() => router.back()}>
                         <Image source={assets.image.left_white} style={{ width: 24, height: 24 }} />
                     </TouchableOpacity>
                 }
                 children={<Text style={{ fontSize: 24, color: 'white' }}>Thanh toán</Text>}
                 rightIcon={
-                    <View />
+                    <View style={{ flexDirection: 'row', gap: 15 }}>
+                        <TouchableOpacity onPress={() => router.push('/(profile)/edit-information')}>
+                            <Image source={assets.image.edit} style={{ width: 24, height: 24 }} />
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => router.push('/(profile)/setting')}>
+                            <Image source={assets.image.setting} style={{ width: 24, height: 24 }} />
+                        </TouchableOpacity>
+                    </View>
                 }
             />
 
             {
                 url ?
-                    <WebView
-                        ref={webViewRef}
-                        source={{
-                            uri: url as string,
-                        }}
-                        injectedJavaScript={injectedJavaScript}
-                        onNavigationStateChange={(navState) => {
-                            const { url } = navState;
+                    isSuccess ?
+                        <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }}>
+                            <Image source={assets.image.success} style={{ width: screen.width / 1.4, height: screen.width / 1.4, alignSelf: 'center', marginBottom: 30 }} />
+                            <Text style={{ fontSize: 24, textAlign: 'center', color: '#19A1CB', textTransform: 'uppercase' }}>Thanh toán</Text>
+                            <Text style={{ fontSize: 24, textAlign: 'center', color: '#19A1CB', textTransform: 'uppercase' }}>Thành công</Text>
+                        </View>
+                        :
+                        <WebView
+                            ref={webViewRef}
+                            source={{
+                                uri: url as string,
+                            }}
+                            injectedJavaScript={injectedJavaScript}
+                            onNavigationStateChange={(navState) => {
+                                const { url } = navState;
 
-                            // Kiểm tra URL có chứa "payment/callback" không
-                            if (url.includes("payment/callback")) {
-                                const urlParams = new URL(url);
-                                const responseCode = urlParams.searchParams.get("vnp_ResponseCode");
+                                // Kiểm tra URL có chứa "payment/callback" không
+                                if (url.includes("payment/callback")) {
+                                    const urlParams = new URL(url);
+                                    const responseCode = urlParams.searchParams.get("vnp_ResponseCode");
 
-                                if (responseCode === "00") {
-                                    // Gọi API cập nhật thông tin user
-                                    updateUserInformation();
-                                } else {
-                                    // Quay lại trang trước
-                                    router.back();
+                                    if (responseCode === "00") {
+                                        // Gọi API cập nhật thông tin user
+                                        updateUserInformation();
+                                    } else {
+                                        // Quay lại trang trước
+                                        setIsSuccess(false);
+                                    }
                                 }
-                            }
-                        }}
-                    />
+                            }}
+                        />
                     :
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                         <ActivityIndicator size={50} />

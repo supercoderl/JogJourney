@@ -39,7 +39,11 @@ export default () => {
     return (
         <View style={styles.container}>
             <Header
-                leftIcon={<Image source={assets.image.add} style={{ width: 24, height: 24 }} />}
+                leftIcon={
+                    <TouchableOpacity onPress={() => router.push('/(communication)/post')}>
+                        <Image source={assets.image.add} style={{ width: 24, height: 24 }} />
+                    </TouchableOpacity>
+                }
                 rightIcon={
                     <View style={{ flexDirection: 'row', gap: 15 }}>
                         <TouchableOpacity onPress={() => router.push('/(map)/save')}>

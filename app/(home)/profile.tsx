@@ -72,11 +72,21 @@ export default function ProfileScreen() {
                 </View>
                 <Horizontal color="#D9D9D9" height={1} />
                 <View>
-                    <TouchableOpacity style={styles.button}>
+                    <TouchableOpacity style={styles.button} onPress={() => router.push('/(profile)/analys')}>
                         <Image source={assets.image.chart} style={{ width: 24, height: 24, marginRight: 8 }} />
                         <View style={styles.buttonTextWrapper}>
                             <Text style={styles.buttonTextTitle}>Thống kê</Text>
                             <Text style={styles.buttonTextSubTitle}>Phân tích dữ liệu cá nhân</Text>
+                        </View>
+                        <Image source={assets.image.right_ios} style={{ width: 24, height: 24 }} />
+                    </TouchableOpacity>
+                </View>
+                <View>
+                    <TouchableOpacity style={styles.button} onPress={() => router.push('/(profile)/premium')}>
+                        <Image source={assets.image.money} style={{ width: 24, height: 24, marginRight: 8 }} />
+                        <View style={styles.buttonTextWrapper}>
+                            <Text style={styles.buttonTextTitle}>Đăng ký</Text>
+                            <Text style={styles.buttonTextSubTitle}>Premium</Text>
                         </View>
                         <Image source={assets.image.right_ios} style={{ width: 24, height: 24 }} />
                     </TouchableOpacity>

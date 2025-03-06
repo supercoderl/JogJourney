@@ -4,17 +4,14 @@ import Header from "@/components/Headers/header-home"
 import Horizontal from "@/components/Horizontal"
 import { auth, firestore } from "@/lib/firebase-config"
 import { useAuth } from "@/providers"
-import { toast } from "@/utils"
-import { doc, updateDoc } from "@firebase/firestore"
-import axios from "axios"
 import { router } from "expo-router"
 import { signOut } from "firebase/auth"
 import React, { useState } from "react"
-import { StyleSheet, View, Text, Image, TouchableOpacity, ActivityIndicator } from "react-native"
+import { StyleSheet, View, Text, Image, TouchableOpacity } from "react-native"
 
 const SettingScreen: React.FC = () => {
     const [loading, setLoading] = useState(false);
-    const { setUser, setUserInformation, userInformation } = useAuth();
+    const { setUser, setUserInformation } = useAuth();
 
     const handleLogout = async () => {
         setLoading(true);
@@ -23,38 +20,6 @@ const SettingScreen: React.FC = () => {
             setUserInformation(null);
             setTimeout(() => router.push('/(auth)/login'));
         }).finally(() => setLoading(false));
-    }
-
-    // const handleActive = async () => {
-    //     if (!userInformation) {
-    //         toast.error("Lỗi xác thực", "Vui lòng đăng nhập lại!");
-    //         router.push('/(auth)/login');
-    //         return;
-    //     }
-
-    //     setLoading(true);
-
-    //     const userRef = doc(firestore, "informations", userInformation.userId);
-    //     await updateDoc(userRef, { type: 'pro' }).then(() => {
-    //         const updatedData = {
-    //             ...userInformation, // Gộp thông tin từ Firestore
-    //             type: 'pro'
-    //         };
-    //         setUserInformation(updatedData);
-    //         toast.success("Cập nhập thành công", "Đã hoàn thành!");
-    //     }).finally(() => setLoading(false));
-    // }
-
-    const handlePay = async () => {
-        setLoading(true);
-        await axios.post("https://supercode-payment-api.vercel.app/api/payment/create_payment_url", {
-            orderInfo: "Nang cap goi Gold",
-            amount: 48000
-        }).then((res) => {
-            if (res && res.data && res.data.status) {
-                router.push({ pathname: '/(profile)/payment', params: { url: res.data.payload } });
-            }
-        }).catch((err) => console.log(err)).finally(() => setLoading(false));
     }
 
     return (
@@ -84,20 +49,6 @@ const SettingScreen: React.FC = () => {
                             </TouchableOpacity>
                         </View>
                         <Text style={styles.service}>Xóa quảng cáo</Text>
-                        <View style={styles.rowService}>
-                            <Text style={styles.service}>Tính năng Pro</Text>
-                            {
-                                loading ?
-                                    <ActivityIndicator size={20} />
-                                    :
-                                    userInformation?.type === 'free' ?
-                                        <TouchableOpacity onPress={handlePay}>
-                                            <Text style={styles.textButton}>Kích hoạt</Text>
-                                        </TouchableOpacity>
-                                        :
-                                        null
-                            }
-                        </View>
                     </View>
 
                     <Horizontal color="#D9D9D9" height={1} />

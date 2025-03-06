@@ -201,3 +201,65 @@ export const getPostsWithoutUser = async (userId: string) => {
         return [];
     }
 };
+
+const formatDate = (timestamp: any) => {
+    const date = new Date(timestamp.toDate());
+    const today = new Date();
+
+    if (date.toDateString() === today.toDateString()) {
+        return "Hôm nay";
+    }
+
+    return date.toLocaleDateString("vi-VN");
+};
+
+export const getChallengesGroupedByDate = async (userId: string) => {
+    try {
+        const challengeQuery = query(
+            collection(firestore, "challenges"),
+            where("userId", "==", userId),
+            orderBy("completedAt", "desc")
+        );
+
+        const snapshot = await getDocs(challengeQuery);
+        const groupedData: any = {};
+
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const dateKey = formatDate(data.completedAt);
+
+            if (!groupedData[dateKey]) {
+                groupedData[dateKey] = {
+                    totalCalories: 0,
+                    totalDistance: 0,
+                    avgSpeed: 0,
+                    count: 0,
+                };
+            }
+
+            groupedData[dateKey].totalCalories += data.caloriesBurned || 0;
+            groupedData[dateKey].totalDistance += data.distance || 0;
+            groupedData[dateKey].avgSpeed += data.speed || 0;
+            groupedData[dateKey].count += 1;
+        });
+
+        // Tính tốc độ trung bình
+        Object.keys(groupedData).forEach((key) => {
+            if (groupedData[key].count > 0) {
+                groupedData[key].avgSpeed /= groupedData[key].count;
+            }
+        });
+
+        // Chuyển object thành mảng để hiển thị trong FlatList
+        const dataArray = Object.entries(groupedData).map(([date, totals]) => ({
+            date,
+            ...(typeof totals === 'object' ? totals : {}),
+        }));
+
+        return dataArray;
+
+    } catch (error) {
+        console.error("Lỗi khi lấy challenge:", error);
+        return null;
+    }
+};

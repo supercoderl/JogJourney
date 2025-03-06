@@ -8,6 +8,8 @@ export default function ProfileStack() {
             <Stack.Screen name="edit-information" />
             <Stack.Screen name="setting" />
             <Stack.Screen name="payment" />
+            <Stack.Screen name="premium" />
+            <Stack.Screen name="analys" />
         </Stack>
     );
 }

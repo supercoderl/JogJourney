@@ -51,6 +51,16 @@ import stop from './images/stop.png';
 import medal from './images/medal.png';
 import run from './images/run.png';
 import bike from './images/bike.png';
+import success from './images/success.png';
+import money from './images/money.png';
+import more_horiz from './images/more_horiz.png';
+import group_white from './images/group_white.png';
+import more_white from './images/more_white.png';
+import broken_image_white from './images/broken_image_white.png';
+import vnpay from './images/vnpay.png';
+import step from './images/step.png';
+import electric from './images/electric.png';
+import speed from './images/speed.png';
 
 import recording from './animations/recording.json';
 
@@ -111,6 +121,16 @@ export default {
         stop,
         medal,
         run,
-        bike
+        bike,
+        success,
+        money,
+        more_horiz,
+        group_white,
+        more_white,
+        broken_image_white,
+        vnpay,
+        step,
+        electric,
+        speed
     },
 };

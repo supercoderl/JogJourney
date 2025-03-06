@@ -9,11 +9,12 @@ interface BaseButtonProps {
     onPress: () => void | Promise<void>;
     loading?: boolean
     viewStyle?: ViewStyle;
+    disabled?: boolean;
 }
 
-const BaseButton: React.FC<BaseButtonProps> = ({ title, buttonStyle, titleStyle, leftIcon, onPress, loading, viewStyle }) => {
+const BaseButton: React.FC<BaseButtonProps> = ({ title, buttonStyle, titleStyle, leftIcon, onPress, loading, viewStyle, disabled }) => {
     return (
-        <TouchableOpacity style={[styles.container, { backgroundColor: loading ? '#EBEBE4' : '#19A1CB' }, buttonStyle]} onPress={onPress} disabled={loading}>
+        <TouchableOpacity style={[styles.container, { backgroundColor: loading ? '#EBEBE4' : '#19A1CB' }, buttonStyle]} onPress={onPress} disabled={disabled || loading}>
             {leftIcon && leftIcon}
             <View
                 style={[{ alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 4 }, viewStyle]}>
