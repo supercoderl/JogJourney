@@ -147,7 +147,7 @@ export default function LoginScreen() {
                         title="Tài khoản Google"
                         buttonStyle={{ backgroundColor: '#F5F5F5' }}
                         titleStyle={{ color: '#595050' }}
-                        onPress={() => {}}
+                        onPress={handleLoginByGoogle}
                         viewStyle={{ flex: 1 }}
                     />
                 </View>
