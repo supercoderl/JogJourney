@@ -9,6 +9,7 @@
  */
 
 import assets from '@/assets';
+import BaseButton from '@/components/Buttons/base-button';
 import Header from '@/components/Headers/header-home';
 import { firestore } from '@/lib/firebase-config';
 import { useAuth } from '@/providers';
@@ -87,10 +88,16 @@ export default function PaymentScreen() {
             {
                 url ?
                     isSuccess ?
-                        <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }}>
+                        <View style={{ flex: 1, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 20 }}>
                             <Image source={assets.image.success} style={{ width: screen.width / 1.4, height: screen.width / 1.4, alignSelf: 'center', marginBottom: 30 }} />
                             <Text style={{ fontSize: 24, textAlign: 'center', color: '#19A1CB', textTransform: 'uppercase' }}>Thanh toán</Text>
                             <Text style={{ fontSize: 24, textAlign: 'center', color: '#19A1CB', textTransform: 'uppercase' }}>Thành công</Text>
+                            <BaseButton
+                                title='Về trang chủ'
+                                buttonStyle={{ backgroundColor: '#19A1CB', marginTop: 30, paddingBlock: 15 }}
+                                titleStyle={{ textTransform: 'uppercase' }}
+                                onPress={() => router.push('/(home)')}
+                            />
                         </View>
                         :
                         <WebView

@@ -34,7 +34,13 @@ const Me: React.FC = () => {
             <FlatList
                 data={posts}
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => <PostScreen post={item} userInformation={userInformation} />}
+                renderItem={({ item }) => (
+                    <PostScreen 
+                        post={item} 
+                        userInformation={userInformation} 
+                        onReload={getPosts}
+                    />
+                )}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ gap: 12 }}
                 refreshControl={

@@ -2,7 +2,7 @@ import assets from "@/assets";
 import Header from "@/components/Headers/header-home";
 import Horizontal from "@/components/Horizontal";
 import { useAuth } from "@/providers";
-import { calculateAge, ensureHttps } from "@/utils";
+import { calculateAge, ensureHttps, toast } from "@/utils";
 import screen from "@/utils/screen";
 import { router } from "expo-router";
 import React from "react";
@@ -82,7 +82,13 @@ export default function ProfileScreen() {
                     </TouchableOpacity>
                 </View>
                 <View>
-                    <TouchableOpacity style={styles.button} onPress={() => router.push('/(profile)/premium')}>
+                    <TouchableOpacity style={styles.button} onPress={() => {
+                        if (userInformation?.type === "pro") {
+                            toast.info("Cảnh báo", "Bạn đã đăng ký gói premium rồi");
+                            return;
+                        }
+                        router.push('/(profile)/premium');
+                    }}>
                         <Image source={assets.image.money} style={{ width: 24, height: 24, marginRight: 8 }} />
                         <View style={styles.buttonTextWrapper}>
                             <Text style={styles.buttonTextTitle}>Đăng ký</Text>

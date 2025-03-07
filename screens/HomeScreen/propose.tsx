@@ -1,11 +1,14 @@
 import assets from "@/assets"
 import BaseButton from "@/components/Buttons/base-button"
+import { deleteFollowDocument } from "@/helpers/api"
 import { firestore } from "@/lib/firebase-config"
 import { useAuth } from "@/providers"
 import { ensureHttps } from "@/utils"
+import screen from "@/utils/screen"
 import { addDoc, collection, doc, getDocs, query, where } from "@firebase/firestore"
 import React, { useEffect, useState } from "react"
-import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { ActivityIndicator, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import { Menu, MenuOption, MenuOptions, MenuTrigger } from "react-native-popup-menu"
 
 const ProposeItem = ({ user, userId, refreshFollowList }: { user: any, userId: string, refreshFollowList: () => void }) => {
     const [loading, setLoading] = useState(false);
@@ -38,22 +41,40 @@ const ProposeItem = ({ user, userId, refreshFollowList }: { user: any, userId: s
     )
 }
 
-const FollowerList = ({ user }: { user: any }) => {
+const FollowerList = ({ user, refreshFollowList, userInformation }: { user: any, refreshFollowList: () => void, userInformation: any }) => {
+    const [loading, setLoading] = useState(false);
+
+    const onUnfollow = async () => {
+        setLoading(true);
+        await deleteFollowDocument(user.id, userInformation?.userId).then(() => {
+            refreshFollowList();
+        }).finally(() => setLoading(false));
+    }
+
     return (
         <View style={styles.followerContainer}>
             <View style={{ flexDirection: 'row', gap: 10, flex: 1, alignItems: 'center', paddingLeft: 30 }}>
                 <Image source={user?.avatar ? { uri: ensureHttps(user?.avatar) } : assets.image.avatar} style={styles.avatar} />
                 <Text style={{ fontWeight: 'bold', fontFamily: 'Inter', fontSize: 16, color: '#342E2E' }}>{user?.fullname ?? 'Dương Kha'}</Text>
             </View>
-            <TouchableOpacity>
-                <Image source={assets.image.right} style={{ width: 25, height: 25 }} />
-            </TouchableOpacity>
+            <Menu>
+                <MenuTrigger>
+                    {
+                        loading ?
+                            <ActivityIndicator size="small" color="#19A1CB" /> :
+                            <Image source={assets.image.right} style={{ width: 25, height: 25 }} />
+                    }
+                </MenuTrigger>
+                <MenuOptions optionsContainerStyle={{ width: 100 }}>
+                    <MenuOption style={{ padding: 10 }} onSelect={onUnfollow} text='Hủy theo dõi' />
+                </MenuOptions>
+            </Menu>
         </View>
     )
 }
 
 const Propose: React.FC = () => {
-    const { user } = useAuth();
+    const { user, userInformation } = useAuth();
     const [followedUsers, setFollowedUsers] = useState<any[]>([]);
     const [unFollowedUsers, setUnFollowedUsers] = useState<any[]>([]);
 
@@ -130,7 +151,7 @@ const Propose: React.FC = () => {
                 <FlatList
                     data={followedUsers}
                     keyExtractor={(item, index) => index.toString()}
-                    renderItem={({ item }) => <FollowerList user={item} />}
+                    renderItem={({ item }) => <FollowerList refreshFollowList={refreshFollowList} user={item} userInformation={userInformation} />}
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ flexGrow: 1 }}
                 />
@@ -161,7 +182,8 @@ const styles = StyleSheet.create({
 
     account_box: {
         width: 77,
-        height: 77
+        height: 77,
+        borderRadius: screen.width
     },
 
     proposeItemWrapper: {

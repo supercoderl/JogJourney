@@ -9,17 +9,28 @@ import { addDoc, collection } from "@firebase/firestore";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View, Image, TextInput } from "react-native";
+import MapView, { Marker } from "react-native-maps";
 
 export default function PostScreen() {
     const { userInformation } = useAuth();
     const [loading, setLoading] = useState(false);
     const [title, setTitle] = useState('');
 
+    const [location, setLocation] = useState({
+        latitude: 10.7769, // Vĩ độ mặc định (TPHCM)
+        longitude: 106.7009, // Kinh độ mặc định (TPHCM)
+    });
+
+    const [delta, setDelta] = useState({
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+    });
+
     const handlePost = async () => {
         const body = {
             title,
             userId: userInformation?.userId,
-            location: { latitude: 10.8132141, longitude: 106.6759019 },
+            location: { latitude: location.latitude, longitude: location.longitude },
             createdAt: new Date(),
         };
 
@@ -35,7 +46,7 @@ export default function PostScreen() {
         <View style={styles.container}>
             <Header
                 leftIcon={
-                    <TouchableOpacity onPress={() => router.replace('/(home)')}>
+                    <TouchableOpacity onPress={() => router.back()}>
                         <Image source={assets.image.left_white} style={{ width: 24, height: 24 }} />
                     </TouchableOpacity>
                 }
@@ -67,6 +78,32 @@ export default function PostScreen() {
                     value={title}
                     onChangeText={setTitle}
                 />
+
+                <MapView
+                    style={styles.map}
+                    initialRegion={{ ...location, ...delta }} // Vị trí ban đầu
+                    onRegionChangeComplete={(region) => {
+                        setDelta({
+                            latitudeDelta: region.latitudeDelta,
+                            longitudeDelta: region.longitudeDelta,
+                        });
+                    }}
+                    onPress={(e) => {
+                        const { latitude, longitude } = e.nativeEvent.coordinate;
+                        setLocation({ latitude, longitude });
+                    }}
+                >
+                    {/* Marker có thể kéo */}
+                    <Marker
+                        coordinate={location}
+                        draggable // Cho phép kéo Marker
+                        pinColor="red" // Kim màu đỏ
+                        onDragEnd={(e) => {
+                            const { latitude, longitude } = e.nativeEvent.coordinate;
+                            setLocation({ ...location, latitude, longitude });
+                        }}
+                    />
+                </MapView>
 
                 <View style={styles.operation}>
                     <Text style={{ fontSize: 13, color: 'white' }}>Thêm vào bài viết của bạn</Text>
@@ -138,7 +175,13 @@ const styles = StyleSheet.create({
 
     input: {
         fontSize: 20,
-        height: screen.height / 2,
+        height: screen.height / 4,
         textAlignVertical: 'top'
     },
+
+    map: {
+        width: '100%',
+        height: screen.height / 3.5,
+        marginBottom: 20
+    }
 });

@@ -1,5 +1,5 @@
 import { firestore } from "@/lib/firebase-config";
-import { collection, doc, getDoc, getDocs, orderBy, query, where } from "@firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, where } from "@firebase/firestore";
 import axios from "axios";
 
 export const uploadImage = async (imageUri: string) => {
@@ -261,5 +261,39 @@ export const getChallengesGroupedByDate = async (userId: string) => {
     } catch (error) {
         console.error("Lỗi khi lấy challenge:", error);
         return null;
+    }
+};
+
+export const deletePostById = async (postId: string) => {
+    try {
+        await deleteDoc(doc(firestore, "posts", postId));
+    } catch (error) {
+        console.error("Error deleting post:", error);
+    }
+};
+
+export const deleteFollowDocument = async (followingId: string, followerId: string) => {
+    try {
+        // Tạo query để tìm document cần xóa
+        const q = query(
+            collection(firestore, "follows"),
+            where("followingId", "==", followingId),
+            where("followerId", "==", followerId)
+        );
+
+        // Lấy danh sách documents phù hợp
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            return;
+        }
+
+        // Xóa từng document tìm được
+        querySnapshot.forEach(async (docSnapshot) => {
+            await deleteDoc(docSnapshot.ref);
+        });
+
+    } catch (error) {
+        console.error("Error deleting document:", error);
     }
 };

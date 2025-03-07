@@ -1,15 +1,18 @@
 import assets from "@/assets"
 import screen from "@/utils/screen"
 import React, { useState } from "react"
-import { View, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback } from "react-native"
+import { View, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, Alert } from "react-native"
 import MapView, { Marker } from 'react-native-maps';
 import BaseButton from "../Buttons/base-button";
 import OutsidePressHandler from 'react-native-outside-press';
-import { ensureHttps } from "@/utils";
+import { ensureHttps, toast } from "@/utils";
+import { Menu, MenuOption, MenuOptions, MenuTrigger } from "react-native-popup-menu";
+import { deletePostById } from "@/helpers/api";
 
 interface PostProps {
     post: any;
     userInformation: any;
+    onReload: () => void;
 }
 
 const Modal = () => {
@@ -30,8 +33,35 @@ const Modal = () => {
     )
 }
 
-const PostScreen: React.FC<PostProps> = ({ post, userInformation }) => {
+const PostScreen: React.FC<PostProps> = ({ post, userInformation, onReload }) => {
     const [modalVisible, setModalVisible] = useState(false);
+
+    const onDelete = async () => {
+        await deletePostById(post.id).then(() => {
+            toast.success("Chúc mừng", "Xóa bài viết thành công");
+            onReload();
+        });
+    }
+
+    const showAlert = () =>
+        Alert.alert(
+            'Xóa bài viết',
+            'Bạn có chắc chắn muốn xóa bài này? Bài viết sẽ không thể được hoàn tác lại!',
+            [
+                {
+                    text: 'Đồng ý',
+                    onPress: onDelete,
+                    style: 'default',
+                },
+                {
+                    text: 'Hủy bỏ',
+                    style: 'cancel',
+                },
+            ],
+            {
+                cancelable: true,
+            },
+        );
 
     return (
         <View style={styles.container}>
@@ -44,7 +74,15 @@ const PostScreen: React.FC<PostProps> = ({ post, userInformation }) => {
                         />
                         <Text style={styles.name}>{userInformation?.name ?? userInformation?.fullname ?? 'Dương Kha'}</Text>
                     </View>
-                    <Image source={assets.image.option} style={{ width: 24, height: 24 }} />
+                    <Menu>
+                        <MenuTrigger>
+                            <Image source={assets.image.option} style={{ width: 24, height: 24 }} />
+                        </MenuTrigger>
+                        <MenuOptions optionsContainerStyle={{ width: 100 }}>
+                            {userInformation?.userId === post?.userId && <MenuOption style={{ padding: 10 }} onSelect={showAlert} text='Xóa bài viết' />}
+                            <MenuOption style={{ padding: 10 }} onSelect={() => { }} text='Báo cáo' />
+                        </MenuOptions>
+                    </Menu>
                 </View>
 
                 <Text style={styles.title}>{post.title}</Text>

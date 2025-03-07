@@ -1,5 +1,6 @@
 import assets from '@/assets';
 import Header from '@/components/Headers/header-home';
+import Loading from '@/components/Loadings/loading';
 import { getChallengesGroupedByDate } from '@/helpers/api';
 import { useAuth } from '@/providers';
 import screen from '@/utils/screen';
@@ -104,6 +105,8 @@ export default function PaymentScreen() {
                         </View>
                     )}
                 />
+
+                {loading && <Loading size={40} />}
             </View>
         </View>
     );
