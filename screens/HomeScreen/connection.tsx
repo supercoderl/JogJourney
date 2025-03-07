@@ -1,3 +1,4 @@
+import BaseBlank from "@/components/Blanks/default-blank"
 import Loading from "@/components/Loadings/loading"
 import PostScreen from "@/components/ui/post"
 import { getPostsWithoutUser, getUserById } from "@/helpers/api"
@@ -6,7 +7,7 @@ import React, { useEffect, useState } from "react"
 import { FlatList, RefreshControl, View } from "react-native"
 
 const Connection: React.FC = () => {
-    const { userInformation } = useAuth();
+    const { userInformation, user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [posts, setPosts] = useState<any[]>([]);
 
@@ -29,7 +30,7 @@ const Connection: React.FC = () => {
 
             // Tạo object { userId: userInfo } để tra cứu nhanh
             const usersMap = Object.fromEntries(usersData.map(u => [u.userId, u.userInfo]));
-            
+
             const postsWithUserInfo = postsData.map((post: any) => ({
                 ...post,
                 user: usersMap[post.userId] || null // Thêm thông tin user vào post
@@ -47,16 +48,17 @@ const Connection: React.FC = () => {
         if (userInformation) {
             getPosts();
         }
-    }, [userInformation]);
+    }, [userInformation, user]);
 
     return (
         <View>
             <FlatList
                 data={posts}
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => <PostScreen post={item} userInformation={item?.user} />}
+                renderItem={({ item }) => <PostScreen onReload={getPosts} post={item} userInformation={item?.user} />}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ gap: 12 }}
+                ListEmptyComponent={<BaseBlank onReload={getPosts} />}
                 refreshControl={
                     <RefreshControl
                         refreshing={loading}
@@ -65,7 +67,7 @@ const Connection: React.FC = () => {
                 }
             />
 
-            {loading && <Loading size={40} />}
+            {loading && <Loading backgroundColor="#c1c3c7" size={40} />}
         </View>
     )
 }

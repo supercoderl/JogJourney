@@ -1,3 +1,4 @@
+import BaseBlank from "@/components/Blanks/default-blank"
 import Loading from "@/components/Loadings/loading"
 import PostScreen from "@/components/ui/post"
 import { getPostsByUser } from "@/helpers/api"
@@ -6,7 +7,7 @@ import React, { useEffect, useState } from "react"
 import { FlatList, RefreshControl, View } from "react-native"
 
 const Me: React.FC = () => {
-    const { userInformation } = useAuth();
+    const { userInformation, user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [posts, setPosts] = useState<any[]>([]);
 
@@ -27,7 +28,7 @@ const Me: React.FC = () => {
         if (userInformation) {
             getPosts();
         }
-    }, [userInformation]);
+    }, [userInformation, user]);
 
     return (
         <View>
@@ -43,6 +44,7 @@ const Me: React.FC = () => {
                 )}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={{ gap: 12 }}
+                ListEmptyComponent={<BaseBlank onReload={getPosts} />}
                 refreshControl={
                     <RefreshControl
                         refreshing={loading}
@@ -51,7 +53,7 @@ const Me: React.FC = () => {
                 }
             />
 
-            {loading && <Loading size={40} />}
+            {loading && <Loading backgroundColor="#c1c3c7" size={40} />}
         </View>
     )
 }

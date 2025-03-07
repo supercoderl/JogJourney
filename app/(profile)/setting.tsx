@@ -18,7 +18,7 @@ const SettingScreen: React.FC = () => {
         await signOut(auth).then(() => {
             setUser(null);
             setUserInformation(null);
-            setTimeout(() => router.push('/(auth)/login'));
+            setTimeout(() => router.push('/(auth)/login'), 1000);
         }).finally(() => setLoading(false));
     }
 

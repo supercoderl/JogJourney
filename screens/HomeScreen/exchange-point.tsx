@@ -1,7 +1,9 @@
 import assets from "@/assets";
+import BaseBlank from "@/components/Blanks/default-blank";
 import BaseButton from "@/components/Buttons/base-button";
 import Loading from "@/components/Loadings/loading";
 import { firestore } from "@/lib/firebase-config";
+import { useAuth } from "@/providers";
 import { ensureHttps, toast } from "@/utils";
 import screen from "@/utils/screen";
 import { collection, doc, getDocs, setDoc } from "@firebase/firestore";
@@ -15,6 +17,7 @@ interface ExchangePointProps {
 
 const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation, setUserInformation }) => {
     const [items, setItems] = useState<any[]>([]);
+    const { user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [exchangeLoading, setExchangeLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -61,7 +64,7 @@ const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation, setUserI
 
     useEffect(() => {
         getItems();
-    }, []);
+    }, [user]);
 
     return (
         <View style={styles.container}>
@@ -110,6 +113,7 @@ const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation, setUserI
                             </View>
                         </View>
                     )}
+                    ListEmptyComponent={<BaseBlank onReload={getItems} />}
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{ gap: 5, paddingBlock: 10 }}
                 />

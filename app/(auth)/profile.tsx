@@ -59,7 +59,7 @@ export default function ProfileScreen() {
                 type: 'free'
             };
             setUserInformation(updatedData);
-            router.push('/(home)');
+            router.push('/');
         }).catch((error: any) => {
             toast.error("Lỗi tạo thông tin", "Vui lòng kiểm tra lại thông tin và thử lại trong giây lát.");
         }).finally(() => setLoading(false));

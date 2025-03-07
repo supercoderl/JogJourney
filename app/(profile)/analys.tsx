@@ -1,4 +1,5 @@
 import assets from '@/assets';
+import BaseBlank from '@/components/Blanks/default-blank';
 import Header from '@/components/Headers/header-home';
 import Loading from '@/components/Loadings/loading';
 import { getChallengesGroupedByDate } from '@/helpers/api';
@@ -16,7 +17,7 @@ import {
 } from 'react-native';
 
 export default function PaymentScreen() {
-    const { userInformation } = useAuth();
+    const { userInformation, user } = useAuth();
     const [groupedChallenges, setGroupedChallenges] = useState<any[] | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -29,7 +30,7 @@ export default function PaymentScreen() {
 
     useEffect(() => {
         getChallenges();
-    }, []);
+    }, [user]);
 
     return (
         <View style={styles.container}>
@@ -104,6 +105,7 @@ export default function PaymentScreen() {
                             </View>
                         </View>
                     )}
+                    ListEmptyComponent={<BaseBlank onReload={getChallenges} />}
                 />
 
                 {loading && <Loading size={40} />}

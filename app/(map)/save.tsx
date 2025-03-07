@@ -1,4 +1,5 @@
 import assets from "@/assets"
+import BaseBlank from "@/components/Blanks/default-blank"
 import BaseButton from "@/components/Buttons/base-button"
 import Header from "@/components/Headers/header-home"
 import Loading from "@/components/Loadings/loading"
@@ -86,6 +87,7 @@ const SaveScreen: React.FC = () => {
                             </TouchableOpacity>
                         </Shadow>
                     )}
+                    ListEmptyComponent={<BaseBlank onReload={getChallenges} />}
                     contentContainerStyle={{ paddingBlock: 20, paddingHorizontal: 10, gap: 30 }}
                 />
                 {loading && <Loading size={40} />}

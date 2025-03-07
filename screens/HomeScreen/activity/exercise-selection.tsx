@@ -1,3 +1,4 @@
+import BaseBlank from "@/components/Blanks/default-blank"
 import Horizontal from "@/components/Horizontal"
 import Loading from "@/components/Loadings/loading"
 import { firestore } from "@/lib/firebase-config"
@@ -46,6 +47,7 @@ const ExerciseSelection = () => {
                                 </View>
                             </TouchableOpacity>
                         )}
+                        ListEmptyComponent={<BaseBlank onReload={getExercises} />}
                         horizontal
                         showsHorizontalScrollIndicator={false}
                         contentContainerStyle={{ paddingBlock: 5 }}
