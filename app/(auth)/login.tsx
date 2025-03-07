@@ -6,23 +6,24 @@ import { auth } from "@/lib/firebase-config";
 import screen from "@/utils/screen";
 import { GoogleAuthProvider, signInWithCredential, signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Formik } from 'formik';
 import { toast } from "@/utils";
 import { Link } from "expo-router";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-// import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
-// GoogleSignin.configure({
-//     webClientId: '779217320193-mh8remlf4ah3bhnu2k9fser55frp48gk.apps.googleusercontent.com',
-//     offlineAccess: true, // Lấy refresh token để duy trì đăng nhập
-//     forceCodeForRefreshToken: true, // Bắt buộc lấy authorization code thay vì chỉ access token
-//     scopes: ['email', 'profile'], // Quyền truy cập email và profile của user
-// });
+GoogleSignin.configure({
+    webClientId: '779217320193-mh8remlf4ah3bhnu2k9fser55frp48gk.apps.googleusercontent.com',
+    offlineAccess: true, // Lấy refresh token để duy trì đăng nhập
+    forceCodeForRefreshToken: true, // Bắt buộc lấy authorization code thay vì chỉ access token
+    scopes: ['email', 'profile'], // Quyền truy cập email và profile của user
+});
 
 export default function LoginScreen() {
     const [errorState, setErrorState] = useState("");
     const [loading, setLoading] = useState(false);
+    const [isPasswordVisible, setPasswordVisible] = useState(false);
 
     const handleLogin = async (values: { email: string, password: string }) => {
         const { email, password } = values;
@@ -54,20 +55,20 @@ export default function LoginScreen() {
     };
 
     const handleLoginByGoogle = async () => {
-        // // // Check if your device supports Google Play
-        // await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-        // // // Get the users ID token
-        // const sInfo = await GoogleSignin.signIn();
+        // // Check if your device supports Google Play
+        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+        // // Get the users ID token
+        const sInfo = await GoogleSignin.signIn();
 
-        // // console.log('====================================');
-        // // console.log("sInfo ", sInfo);
-        // // console.log('====================================');
+        // console.log('====================================');
+        // console.log("sInfo ", sInfo);
+        // console.log('====================================');
 
-        // // // Create a Google credential with the token
-        // const googleCredential = GoogleAuthProvider.credential(sInfo.data?.idToken);
+        // // Create a Google credential with the token
+        const googleCredential = GoogleAuthProvider.credential(sInfo.data?.idToken);
 
-        // // // Sign-in the user with the credential
-        // await signInWithCredential(auth, googleCredential);
+        // // Sign-in the user with the credential
+        await signInWithCredential(auth, googleCredential);
     }
 
     return (
@@ -117,11 +118,18 @@ export default function LoginScreen() {
                                     leftIcon={<Image source={assets.image.lock} style={{ width: 24, height: 24 }} />}
                                     placeholder="Mật khẩu"
                                     placeholderTextColor="#8A8A8A"
-                                    rightIcon={<Image source={assets.image.visibility_off} style={{ width: 24, height: 24 }} />}
+                                    rightIcon={
+                                        <TouchableOpacity onPress={() => setPasswordVisible(!isPasswordVisible)}>
+                                            <Image
+                                                source={assets.image.visibility_off}
+                                                style={{ width: 24, height: 24 }}
+                                            />
+                                        </TouchableOpacity>
+                                    }
                                     autoCapitalize="none"
                                     autoCorrect={false}
                                     value={values.password}
-                                    secureTextEntry={true}
+                                    secureTextEntry={!isPasswordVisible}
                                     onChangeText={handleChange("password")}
                                     onBlur={handleBlur("password")}
                                 />
