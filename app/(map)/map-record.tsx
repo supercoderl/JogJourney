@@ -8,8 +8,8 @@ import MapDetail from "@/screens/HomeScreen/map/map-detail";
 import RecordMap from "@/screens/HomeScreen/map/record";
 import { toast } from "@/utils";
 import screen from "@/utils/screen";
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { StyleSheet, TouchableOpacity, View, Image, Text, Animated, Modal } from "react-native";
 import MapView, { Polyline } from "react-native-maps";
 
@@ -92,7 +92,7 @@ export default function MapRecordScreen() {
     }, [params?.level, params?.exercise]);
 
     useEffect(() => {
-        if (level && map && exercise && Number(distance.toFixed(0)) >= map?.distance) {
+        if (level && map && exercise && Number((distance / 1000).toFixed(0)) >= map?.distance) {
             toast.success("Chúc mừng", "Bạn đã hoàn thành thử thách");
             stopTracking();
             router.replace({
@@ -113,6 +113,14 @@ export default function MapRecordScreen() {
             });
         }
     }, [distance, level, map, exercise]);
+
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                setShowModal(false); // Reset modal khi rời khỏi màn hình
+            };
+        }, [])
+    );
 
     return (
         <View style={styles.container}>
@@ -182,7 +190,7 @@ export default function MapRecordScreen() {
                         border={
                             <View style={styles.border}>
                                 <View style={styles.innerBorder}>
-                                    <Text style={{ fontFamily: 'Jomhuria', fontSize: 128, marginBottom: -30 }}>{(distance / 1000).toFixed(3)}</Text>
+                                    <Text style={{ fontFamily: 'Jomhuria', fontSize: 128, marginBottom: -30 }}>{(distance / 1000).toFixed(2)}</Text>
                                     <Text style={{ fontFamily: 'Jomhuria', fontSize: 64, marginTop: -50, marginBottom: 30, color: '#19A1CB' }}>KM</Text>
                                 </View>
                             </View>
@@ -215,17 +223,21 @@ export default function MapRecordScreen() {
 
                     <Horizontal height={20} color="rgb(240, 238, 238)" styles={{ zIndex: 6 }} />
 
-                    <View style={styles.submitView}>
-                        <TouchableOpacity style={styles.submitButton} onPress={() => {
-                            if (!userInformation?.type || userInformation?.type === 'free') {
-                                toast.error("Không được", "Bạn phải đăng ký gói Pro để vào thử thách");
-                                return;
-                            }
-                            router.push({ pathname: '/(map)/challenge', params: map })
-                        }}>
-                            <Text style={styles.submitText}>Thử thách</Text>
-                        </TouchableOpacity>
-                    </View>
+                    {
+                        !hasStartedTracking.current && (
+                            <View style={styles.submitView}>
+                                <TouchableOpacity style={styles.submitButton} onPress={() => {
+                                    if (!userInformation?.type || userInformation?.type === 'free') {
+                                        toast.error("Không được", "Bạn phải đăng ký gói Pro để vào thử thách");
+                                        return;
+                                    }
+                                    router.push({ pathname: '/(map)/challenge', params: map })
+                                }}>
+                                    <Text style={styles.submitText}>Thử thách</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )
+                    }
                 </Animated.ScrollView>
             </View>
 

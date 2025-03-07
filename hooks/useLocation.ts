@@ -90,8 +90,6 @@ const useCurrentLocation = () => {
                 }
               );
 
-              console.log("Distance: ", dist);
-
               if (dist >= 1) {
                 setDistance((d) => d + dist);
               }
@@ -172,8 +170,6 @@ const useCurrentLocation = () => {
           if (prev.length > 0) {
             const lastLocation = prev[prev.length - 1];
             const dist = getDistance(lastLocation, newLocation.coords);
-
-            console.log("Distance: ", dist);
 
             if (dist >= 1) {
               setDistance((d) => d + dist);

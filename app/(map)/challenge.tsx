@@ -1,7 +1,7 @@
 import assets from "@/assets";
 import Header from "@/components/Headers/header-home";
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import { TouchableOpacity, View, Image, Text, StyleSheet, Modal, FlatList, RefreshControl } from "react-native";
 import { Shadow } from "react-native-shadow-2";
 import BaseButton from "@/components/Buttons/base-button";
@@ -86,6 +86,14 @@ const ChallengeScreen: React.FC = () => {
         getLevelsAsync();
     }, []);
 
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                setShowModal(false); // Reset modal khi rời khỏi màn hình
+            };
+        }, [])
+    );
+
     return (
         <View style={styles.container}>
             <Header
@@ -119,6 +127,7 @@ const ChallengeScreen: React.FC = () => {
                                 }
                                 buttonStyle={styles.button}
                                 onPress={() => {
+                                    console.log("Show in challenge");
                                     setShowModal(true);
                                     setSelectedLevel(item);
                                 }}
@@ -164,11 +173,13 @@ const ChallengeScreen: React.FC = () => {
 
                         <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: '100%' }}>
                             <TouchableOpacity style={styles.modalButton} onPress={() =>
-                                router.push({ pathname: '/(map)/map-record', params: {
-                                    map: JSON.stringify(map),
-                                    level: JSON.stringify(selectedLevel),
-                                    exercise: JSON.stringify(selectedEx)
-                                } })
+                                router.push({
+                                    pathname: '/(map)/map-record', params: {
+                                        map: JSON.stringify(map),
+                                        level: JSON.stringify(selectedLevel),
+                                        exercise: JSON.stringify(selectedEx)
+                                    }
+                                })
                             }>
                                 <Text style={styles.modalButtonText}>Yes</Text>
                             </TouchableOpacity>

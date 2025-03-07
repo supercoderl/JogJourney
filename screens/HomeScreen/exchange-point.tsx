@@ -7,7 +7,8 @@ import { useAuth } from "@/providers";
 import { ensureHttps, toast } from "@/utils";
 import screen from "@/utils/screen";
 import { collection, doc, getDocs, setDoc } from "@firebase/firestore";
-import React, { useEffect, useState } from "react"
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react"
 import { ActivityIndicator, FlatList, Image, Modal, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from "react-native"
 
 interface ExchangePointProps {
@@ -33,7 +34,7 @@ const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation, setUserI
     const handleExchange = async () => {
         setExchangeLoading(true);
 
-        if(!userInformation || !item) {
+        if (!userInformation || !item) {
             toast.error("Lỗi", "Lỗi hệ thống, vui lòng kiểm tra lại.");
             setShowModal(false);
             setExchangeLoading(false);
@@ -65,6 +66,14 @@ const ExchangePoint: React.FC<ExchangePointProps> = ({ userInformation, setUserI
     useEffect(() => {
         getItems();
     }, [user]);
+
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                setShowModal(false); // Reset modal khi rời khỏi màn hình
+            };
+        }, [])
+    );
 
     return (
         <View style={styles.container}>

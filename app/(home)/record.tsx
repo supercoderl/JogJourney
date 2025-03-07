@@ -7,8 +7,8 @@ import { useAuth } from "@/providers";
 import RecordMap from "@/screens/HomeScreen/map/record";
 import { toast } from "@/utils";
 import screen from "@/utils/screen";
-import { router } from "expo-router";
-import React, { useRef, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import React, { useCallback, useRef, useState } from "react";
 import { StyleSheet, TouchableOpacity, View, Image, Text, Animated, Modal, ActivityIndicator } from "react-native";
 import MapView, { Circle } from "react-native-maps";
 import LottieView from 'lottie-react-native';
@@ -34,6 +34,14 @@ export default function RecordScreen() {
     const { userInformation } = useAuth();
 
     const [showModal, setShowModal] = useState(false);
+
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                setShowModal(false); // Reset modal khi rời khỏi màn hình
+            };
+        }, [])
+    );
 
     return (
         <View style={styles.container}>
