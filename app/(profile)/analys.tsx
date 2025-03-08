@@ -63,6 +63,7 @@ export default function PaymentScreen() {
                 <FlatList
                     data={groupedChallenges}
                     keyExtractor={(item, index) => index.toString()}
+                    showsVerticalScrollIndicator={false}
                     renderItem={({ item }) => (
                         <View style={{ marginTop: 10 }}>
                             <Text style={styles.date}>{item.date}</Text>
@@ -80,8 +81,8 @@ export default function PaymentScreen() {
                                         <View style={[styles.itemRow, { gap: 15 }]}>
                                             <Image source={assets.image.step} style={{ width: 24, height: 26 }} />
                                             <View>
-                                                <Text style={styles.itemTitle}>Bước</Text>
-                                                <Text style={styles.itemText}>1200</Text>
+                                                <Text style={styles.itemTitle}>Thời gian</Text>
+                                                <Text style={styles.itemText}>{(item.elapsedTime / 60).toFixed(0)} phút</Text>
                                             </View>
                                         </View>
 

@@ -120,14 +120,6 @@ const DetailScreen: React.FC = () => {
 
                         setInfoUser([
                             {
-                                value: 0,
-                                text: 'Nhịp tim trung bình'
-                            },
-                            {
-                                value: 0,
-                                text: 'Nhịp tim cao nhất \n\n'
-                            },
-                            {
                                 value: ((parsedResult.speed ?? 1.2) * 3.6).toFixed(2),
                                 text: 'Tốc độ trung bình (km/h)'
                             },
@@ -206,7 +198,7 @@ const DetailScreen: React.FC = () => {
                 <View style={styles.contentContainer}>
                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
                         <Image source={assets.image.cardiogram} style={{ width: 62, height: 55.1 }} />
-                        <Text style={styles.detailTitle}>Nhịp tim</Text>
+                        <Text style={styles.detailTitle}>Tốc độ</Text>
                     </View>
 
                     <InformationDetail data={infoUser} />

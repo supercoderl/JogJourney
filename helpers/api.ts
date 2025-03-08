@@ -234,6 +234,7 @@ export const getChallengesGroupedByDate = async (userId: string) => {
                     totalDistance: 0,
                     avgSpeed: 0,
                     count: 0,
+                    elapsedTime: 0
                 };
             }
 
@@ -241,6 +242,7 @@ export const getChallengesGroupedByDate = async (userId: string) => {
             groupedData[dateKey].totalDistance += data.distance || 0;
             groupedData[dateKey].avgSpeed += data.speed || 0;
             groupedData[dateKey].count += 1;
+            groupedData[dateKey].elapsedTime += data.elapsedTime || 0;
         });
 
         // Tính tốc độ trung bình

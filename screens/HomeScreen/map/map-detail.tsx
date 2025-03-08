@@ -27,32 +27,24 @@ const MapDetail: React.FC<MapDetailProps> = ({ map, recordInfo, loading }) => {
                     <Text style={styles.text}>Nhiệt độ (℃)</Text>
                 </View>
                 <View style={styles.itemB}>
-                    <Text style={styles.value}>123</Text>
-                    <Text style={styles.text}>Nhịp tim</Text>
-                </View>
-                <View style={styles.itemA}>
                     <Text style={styles.value}>{recordInfo?.level ? 1 : 0}</Text>
                     <Text style={styles.text}>Thử thách</Text>
                 </View>
-                <View style={styles.itemB}>
-                    <Text style={styles.value}>{recordInfo?.stepCount ?? 0}</Text>
-                    <Text style={styles.text}>Bước chân</Text>
-                </View>
                 <View style={styles.itemA}>
                     <Text style={styles.value}>{map?.status ? 'Open' : 'Close'}</Text>
-                    <Text style={styles.text}>Status</Text>
+                    <Text style={styles.text}>Trạng thái</Text>
                 </View>
                 <View style={styles.itemB}>
                     <Text style={styles.value}>{map?.address ?? 'P3, Gò Vấp, TP.HCM'}</Text>
-                    <Text style={styles.text}>Location</Text>
+                    <Text style={styles.text}>Địa điểm</Text>
                 </View>
                 <View style={styles.itemA}>
                     <Text style={styles.value}>30</Text>
-                    <Text style={styles.text}>Participants</Text>
+                    <Text style={styles.text}>Người tham gia</Text>
                 </View>
                 <View style={styles.itemB}>
                     <Text style={styles.value}>{map?.rate ?? 4} <Text style={{ fontSize: 18 }}>⭐</Text></Text>
-                    <Text style={styles.text}>Rate</Text>
+                    <Text style={styles.text}>Đánh giá</Text>
                 </View>
             </View>
         </View>

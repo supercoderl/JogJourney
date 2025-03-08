@@ -167,8 +167,8 @@ export default function RecordScreen() {
                                 <Text style={styles.text}>Km</Text>
                             </View>
                             <View style={styles.itemB}>
-                                <Text style={styles.value}>300</Text>
-                                <Text style={styles.text}>Bước</Text>
+                                <Text style={styles.value}>{(elapsedTime / 60).toFixed(0)}</Text>
+                                <Text style={styles.text}>Phút</Text>
                             </View>
                             <View style={styles.itemA}>
                                 <Text style={styles.value}>{caloriesBurned.toFixed(1)}</Text>
