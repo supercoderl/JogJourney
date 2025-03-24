@@ -71,8 +71,8 @@ export default function PremiumScreen() {
                 <Horizontal height={1} color='#D9D9D9' styles={{ marginBottom: 30 }} />
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
-                    <Image source={assets.image.vnpay} style={{ width: 43, height: 43 }} />
-                    <Text style={{ flex: 1, fontSize: 14, color: '#8A8A8A' }}>VNPay</Text>
+                    <Image source={assets.image.payos} style={{ width: 43, height: 43 }} />
+                    <Text style={{ flex: 1, fontSize: 14, color: '#8A8A8A' }}>PayOs</Text>
                     <RadioButton
                         value={'option1'}
                         selected={selectedValue === 'option1'}
