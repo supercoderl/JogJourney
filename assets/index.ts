@@ -61,6 +61,7 @@ import vnpay from './images/vnpay.png';
 import step from './images/step.png';
 import electric from './images/electric.png';
 import speed from './images/speed.png';
+import payos from './images/payos.png';
 
 import recording from './animations/recording.json';
 
@@ -131,6 +132,7 @@ export default {
         vnpay,
         step,
         electric,
-        speed
+        speed,
+        payos
     },
 };

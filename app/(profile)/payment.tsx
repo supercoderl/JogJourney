@@ -38,7 +38,7 @@ export default function PaymentScreen() {
     // JavaScript để gửi dữ liệu từ WebView về React Native
     const injectedJavaScript = `
       window.addEventListener("message", function(event) {
-        if (event.data && event.data.includes("vnp_TransactionStatus=00")) {
+        if (event.data && event.data.includes("code=00") && event.data.includes("status=PAID")) {
           window.ReactNativeWebView.postMessage("success");
         } else {
           window.ReactNativeWebView.postMessage("fail");
@@ -109,12 +109,13 @@ export default function PaymentScreen() {
                             onNavigationStateChange={(navState) => {
                                 const { url } = navState;
 
-                                // Kiểm tra URL có chứa "payment/callback" không
-                                if (url.includes("payment/callback")) {
+                                // Kiểm tra URL có chứa "payment/payos/callback" không
+                                if (url.includes("payment/payos/callback")) {
                                     const urlParams = new URL(url);
-                                    const responseCode = urlParams.searchParams.get("vnp_ResponseCode");
+                                    const responseCode = urlParams.searchParams.get("code");
+                                    const status = urlParams.searchParams.get("status");
 
-                                    if (responseCode === "00") {
+                                    if (responseCode === "00" && status === "PAID") {
                                         // Gọi API cập nhật thông tin user
                                         updateUserInformation();
                                     } else {

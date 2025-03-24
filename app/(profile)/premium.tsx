@@ -21,12 +21,13 @@ export default function PremiumScreen() {
 
     const handlePay = async () => {
         setLoading(true);
-        await axios.post("https://supercode-payment-api.vercel.app/api/payment/create_payment_url", {
-            orderInfo: "Nang cap goi Gold",
-            amount: 50000
+        await axios.post("https://supercodepaymentapi.somee.com/api/Payment/payos", {
+            productName: "Thanh toan 20k",
+            description: "Nang cap goi Premium",
+            price: 20000
         }).then((res) => {
-            if (res && res.data && res.data.status) {
-                router.push({ pathname: '/(profile)/payment', params: { url: res.data.payload } });
+            if (res && res.data && res.data.success) {
+                router.push({ pathname: '/(profile)/payment', params: { url: res.data?.data?.checkoutUrl ?? null } });
             }
         }).catch((err) => console.log(err)).finally(() => setLoading(false));
     }
@@ -53,7 +54,7 @@ export default function PremiumScreen() {
                 <Horizontal height={80} width={1} color="#D9D9D9" />
                 <View style={styles.item}>
                     <View style={styles.textContainer}>
-                        <Text style={styles.title}>50.000</Text>
+                        <Text style={styles.title}>20.000</Text>
                         <Text style={styles.subTitle}>Vnd</Text>
                     </View>
                 </View>

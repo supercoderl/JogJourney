@@ -144,12 +144,12 @@ export default function LoginScreen() {
                 <Horizontal height={1} color="#8A8A8A" styles={{ marginBlock: 20, width: '95%' }} />
 
                 <View style={{ gap: 15, width: '100%' }}>
-                    <BaseButton
+                    {/* <BaseButton
                         leftIcon={<Image source={assets.image.facebook} style={{ width: 24, height: 24 }} />}
                         title="Tài khoản Facebook"
                         viewStyle={{ flex: 1 }}
                         onPress={() => { }}
-                    />
+                    /> */}
                     <BaseButton
                         leftIcon={<Image source={assets.image.google} style={{ width: 24, height: 24 }} />}
                         title="Tài khoản Google"
