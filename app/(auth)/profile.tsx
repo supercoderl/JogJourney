@@ -45,7 +45,8 @@ export default function ProfileScreen() {
             weight: Number(weight),
             avatar: image,
             totalPoints: 0,
-            type: 'free'
+            type: 'free',
+            role: 'user'
         }).then(() => {
             const updatedData = {
                 ...userInformation, // Gộp thông tin từ Firestore
@@ -56,7 +57,8 @@ export default function ProfileScreen() {
                 weight: (weight),
                 avatar: image,
                 totalPoints: 0,
-                type: 'free'
+                type: 'free',
+                role: 'user'
             };
             setUserInformation(updatedData);
             router.push('/');

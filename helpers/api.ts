@@ -299,3 +299,19 @@ export const deleteFollowDocument = async (followingId: string, followerId: stri
         console.error("Error deleting document:", error);
     }
 };
+
+export const getTransactions = async () => {
+    try {
+        const querySnapshot = await getDocs(collection(firestore, "transactions"));
+
+        const transactions: any[] = [];
+        querySnapshot.forEach((doc) => {
+            transactions.push({ id: doc.id, ...doc.data() });
+        });
+
+        return transactions;
+    } catch (error) {
+        console.error("Lỗi khi lấy transactions:", error);
+        return [];
+    }
+};

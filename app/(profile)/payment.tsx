@@ -15,7 +15,7 @@ import { firestore } from '@/lib/firebase-config';
 import { useAuth } from '@/providers';
 import { toast } from '@/utils';
 import screen from '@/utils/screen';
-import { doc, updateDoc } from '@firebase/firestore';
+import { addDoc, collection, doc, updateDoc } from '@firebase/firestore';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useRef, useState } from 'react';
 import {
@@ -46,7 +46,7 @@ export default function PaymentScreen() {
       });
     `;
 
-    const updateUserInformation = async () => {
+    const updateUserInformation = async (code: string, status: string) => {
         if (!userInformation) {
             toast.error("Lỗi xác thực", "Vui lòng đăng nhập lại!");
             router.push('/(auth)/login');
@@ -54,13 +54,24 @@ export default function PaymentScreen() {
         }
 
         const userRef = doc(firestore, "informations", userInformation.userId);
-        await updateDoc(userRef, { type: 'pro' }).then(() => {
+        await updateDoc(userRef, { type: 'pro' }).then(async () => {
             const updatedData = {
                 ...userInformation, // Gộp thông tin từ Firestore
                 type: 'pro'
             };
             setUserInformation(updatedData);
             setIsSuccess(true);
+            await createTransaction(userInformation.userId, code, status);
+        });
+    }
+
+    const createTransaction = async (userId: string, code: string, status: string) => {
+        await addDoc(collection(firestore, 'transactions'), {
+            userId,
+            amount: 20000,
+            code,
+            status,
+            createdAt: new Date()
         });
     }
 
@@ -117,7 +128,7 @@ export default function PaymentScreen() {
 
                                     if (responseCode === "00" && status === "PAID") {
                                         // Gọi API cập nhật thông tin user
-                                        updateUserInformation();
+                                        updateUserInformation(responseCode, status);
                                     } else {
                                         // Quay lại trang trước
                                         setIsSuccess(false);

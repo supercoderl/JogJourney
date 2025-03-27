@@ -41,7 +41,9 @@ export default () => {
                             };
 
                             setUserInformation(combinedUserData); // Lưu object kết hợp vào state
-                            router.push('/(home)');
+                            
+                            if(information.role === "admin") router.push('/(manager)');
+                            else router.push('/(home)');
                         }
                         else {
                             router.push('/(auth)/profile');

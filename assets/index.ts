@@ -62,6 +62,8 @@ import step from './images/step.png';
 import electric from './images/electric.png';
 import speed from './images/speed.png';
 import payos from './images/payos.png';
+import cash from './images/cash.png';
+import premium from './images/premium.png';
 
 import recording from './animations/recording.json';
 
@@ -133,6 +135,8 @@ export default {
         step,
         electric,
         speed,
-        payos
+        payos,
+        cash,
+        premium
     },
 };

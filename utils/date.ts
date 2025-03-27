@@ -2,7 +2,7 @@ import { capitalizeWords } from ".";
 
 export const formatTimeAndDay = (
     timestamp: { seconds: number; nanoseconds: number } | Date,
-    formatType?: 'time12h' | 'fullDate' | 'shortDateTime' | 'dateTime12h'
+    formatType?: 'time12h' | 'fullDate' | 'shortDateTime' | 'dateTime12h' | 'date'
 ) => {
     if ('seconds' in timestamp && 'nanoseconds' in timestamp) {
         timestamp = new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1_000_000);
@@ -55,6 +55,16 @@ export const formatTimeAndDay = (
         });
 
         return `${date} - ${time}`;
+    }
+
+    if (formatType === 'date') {
+        const date = timestamp.toLocaleDateString('vi-VN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+
+        return `${date}`;
     }
 
     return timestamp.toLocaleTimeString('vi-VN', {
